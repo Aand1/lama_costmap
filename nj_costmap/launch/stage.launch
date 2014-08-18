@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="model" default="$(find lama_test)/worlds/stage-270.world" />
+  <arg name="debug" default="false" />
+  <arg name="launch_nj" default="true" />
+
+  <!--
+  <param name="use_sim_time" value="true" />
+  -->
+
+  <node name="stage" pkg="stage_ros" type="stageros"
+    args="$(arg model)" />
+
+  <node name="rviz" pkg="rviz" type="rviz"
+    args="-d $(find nj_costmap)/worlds/stage-gmapping.rviz">
+  </node>
+
+  <node name="costmap" pkg="local_map" type="local_map"
+    output="screen" launch-prefix="">
+	<remap from="costmap/scan" to="/base_scan" />
+  </node>
+
+  <!--
+  rosrun nj_costmap nj_costmap __name:=nj_costmap \
+	_odom_frame:=base_link \
+	_frontier_width:=0.2 \
+	nj_costmap/local_costmap:=costmap/local_map \
+    nj_costmap/cmd_vel:=/cmd_vel \
+    nj_costmap/base_scan:=/base_scan
+  -->
+  <group if="$(arg launch_nj)">
+	<!--
+    <node name="nj_costmap" pkg="nj_costmap" type="nj_costmap"
+		output="screen" launch-prefix="valgrind -DELETEME-tool=callgrind">
+	-->
+    <node name="nj_costmap" pkg="nj_costmap" type="nj_costmap"
+		output="screen">
+      <param name="odom_frame" value="base_link" />
+	  <param name="frontier_width" value="0.16" />
+	  <remap from="nj_costmap/local_costmap" to="costmap/local_map" />
+      <remap from="nj_costmap/cmd_vel" to="/cmd_vel" />
+      <remap from="nj_costmap/base_scan" to="/base_scan" />
+    </node>
+  </group>
+
+  <group if="$(arg debug)">
+    <node name="rqt_graph" pkg="rqt_graph" type="rqt_graph" />
+  </group>
+</launch>

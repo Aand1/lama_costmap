@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="debug" default="false" />
+
+  <node name="reset_odom" pkg="rosservice" type="rosservice"
+	  args="call --wait /syros/base/position2d/reset_odom_from_frame &quot;/syros/global_odom&quot;"/>
+
+  <!--
+  rosrun rviz rviz -d $(rospack find nj_costmap)/worlds/syrotek-workaround.rviz
+  -->
+  <node name="rviz" pkg="rviz" type="rviz"
+    args="-d $(find nj_costmap)/worlds/syrotek-workaround.rviz">
+  </node>
+
+  <!-- Workaround laser timestamp bug and missing feature "laser in local frame" in syros (2014-05-28) -->
+  <node name="syrotek_workaround" pkg="syrotek_workaround" type="resend"
+	 output="screen" />
+
+  <!--
+  rosrun local_map local_map __name:=costmap costmap/scan:=/scan
+  -->
+  <node name="costmap" pkg="local_map" type="local_map"
+    output="screen">
+	<remap from="costmap/scan" to="/syrotek_workaround/scan" />
+  </node>
+
+  <!--
+  rosrun nj_costmap nj_costmap __name:=nj_costmap \
+	_odom_frame:=/syros/laser_ranger \
+	_frontier_width:=0.16 \
+	nj_costmap/local_costmap:=costmap/local_map \
+	nj_costmap/cmd_vel:=/syrotek_workaround/cmd_vel
+  -->
+  <!--
+  <node name="nj_costmap" pkg="nj_costmap" type="nj_costmap"
+    output="screen">
+	<param name="odom_frame" value="/syros/laser_ranger" />
+	<param name="frontier_width" value="0.16" />
+	<remap from="nj_costmap/local_costmap" to="costmap/local_map" />
+	<remap from="nj_costmap/cmd_vel" to="/syrotek_workaround/cmd_vel" />
+  </node>
+-->
+
+  <group if="$(arg debug)">
+    <node name="rqt_graph" pkg="rqt_graph" type="rqt_graph" />
+  </group>
+</launch>

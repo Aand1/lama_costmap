@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="debug" default="false" />
+
+  <!--
+  rosrun rviz rviz -d $(rospack find nj_costmap)/worlds/syrotek.rviz
+  -->
+  <node name="rviz" pkg="rviz" type="rviz"
+    args="-d $(find nj_costmap)/worlds/syrotek.rviz">
+  </node>
+
+  <!--
+  rosrun local_map local_map __name:=costmap scan:=/syros/laser_laser
+  -->
+  <node name="costmap" pkg="local_map" type="local_map"
+    output="screen">
+	<remap from="costmap/scan" to="/syros/laser_laser" />
+  </node>
+
+  <!--
+  rosrun nj_costmap nj_costmap __name:=nj_costmap \
+	_odom_frame:=/syros/laser_ranger \
+	nj_costmap/local_costmap:=/local_map \
+    nj_costmap/cmd_vel:=/syros/base_cmd_vel
+  -->
+  <!--
+  <node name="nj_costmap" pkg="nj_costmap" type="nj_costmap"
+    output="screen">
+	<param name="odom_frame" value="/syros/laser_ranger" />
+	<remap from="nj_costmap/local_costmap" to="/local_map" />
+	<remap from="nj_costmap/cmd_vel" to="/syros/base_cmd_vel" />
+  </node>
+-->
+
+  <group if="$(arg debug)">
+    <node name="rqt_graph" pkg="rqt_graph" type="rqt_graph" />
+  </group>
+</launch>
