@@ -8,7 +8,7 @@
 
 #include "Voronoi.h"
 
-namespace Lama{
+namespace lama{
 namespace PolygonUtils {
 
 using std::list;
@@ -300,12 +300,8 @@ std::vector< TPoint<T> >cutPolygon(const std::vector< TPoint<T> > &pts, const T 
 	return result;
 }
 
+} // namespace PolygonUtils
+} // namesapce lama
 
-
-} // namesapce
-
-
-} // namespace Polygons
-
-#endif // #ifndef _NJ_COSTMAP_POLYGON_UTILS_H_
+#endif // _NJ_COSTMAP_POLYGON_UTILS_H_
 

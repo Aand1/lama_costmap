@@ -37,7 +37,7 @@ ros::Publisher pub_twist;
 ros::Publisher marker;
 ros::Publisher roadMarker;
 ros::Publisher fakeLaserMarker;
-Lama::Laloc::LMapLoc loc;
+lama::Laloc::LMapLoc loc;
 
 std::string odom_frame;
 

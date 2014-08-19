@@ -4,7 +4,7 @@
 #include "nj_costmap/lmap_loc.h"
 #include "nj_costmap/crossDetect.h"
 
-namespace Lama {
+namespace lama {
 namespace Laloc {
 
 LMapLoc::LMapLoc() :
@@ -69,4 +69,4 @@ void LMapLoc::setFrontierWidth(double frontier_width)
 }
 
 } // namespace Laloc
-} // namespace Lama
+} // namespace lama

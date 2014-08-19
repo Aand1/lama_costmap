@@ -1,11 +1,11 @@
-#ifndef LMAP_LOC_H_
-#define LMAP_LOC_H
+#ifndef _NJ_COSTMAP_LMAP_LOC_H_
+#define _NJ_COSTMAP_LMAP_LOC_H
 
 #include <nav_msgs/OccupancyGrid.h>
 
 #include "nj_costmap/lmap_loc_types.h"
 
-namespace Lama {
+namespace lama {
 namespace Laloc {
 
 class LMapLoc {
@@ -34,6 +34,6 @@ class LMapLoc {
 };
 
 } // namespace Laloc
-} // namespace Lama
+} // namespace lama
 
-#endif //#ifndef LMAP_LOC_H_
+#endif // _NJ_COSTMAP_LMAP_LOC_H_

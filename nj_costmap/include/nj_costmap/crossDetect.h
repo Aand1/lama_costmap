@@ -10,7 +10,7 @@
 #define FAKE_SCAN_RESOLUTION  0.017453293 // (rad), 1 deg
 #define OCCUPIED_THRESHOLD 40 // 0 = free, 100 = occupied
 
-namespace Lama {
+namespace lama {
 namespace Laloc {
 
 void getXingDesc(
@@ -21,6 +21,6 @@ void getXingDesc(
 std::vector<double> mapToScan(const nav_msgs::OccupancyGrid& map);
 
 } // namespace Laloc
-} // namespace Lama
+} // namespace lama
 
 #endif // #ifndef _NJ_COSTMAP_CROSSDETECT_H_

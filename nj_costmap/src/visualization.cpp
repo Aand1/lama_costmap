@@ -54,7 +54,7 @@ sensor_msgs::LaserScan getFakeLaser(nav_msgs::OccupancyGrid& msg)
 {
 	sensor_msgs::LaserScan scan;
 
-	std::vector<double> scanPts = Lama::Laloc::mapToScan(msg);
+	std::vector<double> scanPts = lama::Laloc::mapToScan(msg);
 	static uint32_t seq = 0;
 	scan.header.seq = seq++;
 	scan.header.frame_id = msg.header.frame_id;

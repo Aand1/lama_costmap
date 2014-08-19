@@ -22,7 +22,7 @@
 #include <fstream>
 #endif
 
-namespace Lama {
+namespace lama {
 namespace Laloc {
 
 // A map to store previously computed distances with ANN
@@ -609,7 +609,7 @@ void getXingDesc(
 	double relevanceFilterRadius = 0.15;
 	std::vector<double> scan = mapToScan(map);
 	std::vector<Voronoi::Point> pts = scanToVpoint(scan);
-	std::vector<Voronoi::Point> filt_pts(Lama::PolygonUtils::filterRelevance(pts, relevanceFilterRadius));
+	std::vector<Voronoi::Point> filt_pts(lama::PolygonUtils::filterRelevance(pts, relevanceFilterRadius));
 
 	ROS_DEBUG("Number of scan points: %zu", pts.size());
 	ROS_DEBUG("Number of filtered scan points: %zu", filt_pts.size());
@@ -725,4 +725,4 @@ void getXingDesc(
 
 
 } // namespace Laloc
-} // namespace Lama
+} // namespace lama
