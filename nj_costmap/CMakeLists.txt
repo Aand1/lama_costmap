@@ -4,13 +4,14 @@ project(nj_costmap)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  actionlib
-  tf
-  nav_msgs
-  geometry_msgs
-  lama_interfaces
+find_package(catkin REQUIRED
+	COMPONENTS
+	roscpp
+	actionlib
+	tf
+	nav_msgs
+	geometry_msgs
+	lama_interfaces
 )
 
 ## System dependencies are found with CMake's conventions
@@ -84,8 +85,8 @@ find_package(ANN REQUIRED)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  INCLUDE_DIRS include 3rdparty/Voronoi/include
-  CATKIN_DEPENDS ann roscpp actionlib tf nav_msgs geometry_msgs lama_interfaces
+	INCLUDE_DIRS include 3rdparty/Voronoi/include
+	CATKIN_DEPENDS ann roscpp actionlib tf nav_msgs geometry_msgs lama_interfaces
 )
 
 ###########
@@ -101,6 +102,7 @@ include_directories(
   include
   3rdparty/Voronoi/include
   ${catkin_INCLUDE_DIRS}
+  ${ANN_INCLUDE_DIRS}
 )
 
 ## Declare a cpp library
@@ -119,7 +121,10 @@ add_executable(${PROJECT_NAME} ${SRC})
 add_dependencies(${PROJECT_NAME} lama_interfaces)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${ANN_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}
+	${catkin_LIBRARIES}
+	${ANN_LIBRARIES}
+	)
 
 #############
 ## Install ##
