@@ -14,7 +14,8 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
+find_package(ANN REQUIRED)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -83,8 +84,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  INCLUDE_DIRS include 3rdparty/Voronoi/include 3rdparty/ANN/include
-  CATKIN_DEPENDS roscpp actionlib tf nav_msgs geometry_msgs lama_interfaces
+  INCLUDE_DIRS include 3rdparty/Voronoi/include
+  CATKIN_DEPENDS ann roscpp actionlib tf nav_msgs geometry_msgs lama_interfaces
 )
 
 ###########
@@ -99,7 +100,6 @@ list(APPEND CMAKE_CXX_FLAGS "-std=c++11")
 include_directories(
   include
   3rdparty/Voronoi/include
-  3rdparty/ANN/include
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -111,16 +111,15 @@ include_directories(
 ## Declare a cpp executable
 file(GLOB NJ_COSTMAP_SRC src/*.cpp)
 file(GLOB VORONOI_SRC 3rdparty/Voronoi/src/*.cc)
-file(GLOB ANN_SRC 3rdparty/ANN/src/*.cpp)
-set(SRC src/nj_costmap.cpp ${VORONOI_SRC} ${ANN_SRC} ${NJ_COSTMAP_SRC})
-add_executable(nj_costmap ${SRC})
+set(SRC src/nj_costmap.cpp ${VORONOI_SRC} ${NJ_COSTMAP_SRC})
+add_executable(${PROJECT_NAME} ${SRC})
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(nj_costmap lama_interfaces)
+add_dependencies(${PROJECT_NAME} lama_interfaces)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(nj_costmap ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${ANN_LIBRARIES})
 
 #############
 ## Install ##
