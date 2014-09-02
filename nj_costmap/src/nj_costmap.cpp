@@ -17,8 +17,8 @@
 #include <sensor_msgs/LaserScan.h>
 
 #include <lama_interfaces/NavigateAction.h>
-#include <lama_interfaces/lmi_laser_descriptor_get.h>
-#include <lama_interfaces/lmi_laser_descriptor_set.h>
+#include <lama_interfaces/GetVectorLaserScan.h>
+#include <lama_interfaces/SetVectorLaserScan.h>
 #include <nj_costmap/lmap_loc.h>
 #include <nj_costmap/visualization.h>
 
@@ -154,7 +154,7 @@ void handleCostmap(nav_msgs::OccupancyGrid msg)
 
 bool executeNavigate(const li::NavigateGoalConstPtr& goal, NavServer* server)
 {
-  li::lmi_laser_descriptor_get ldg;
+  li::GetVectorLaserScan ldg;
   li::NavigateResult result;
 
   switch (goal->action)
@@ -166,7 +166,7 @@ bool executeNavigate(const li::NavigateGoalConstPtr& goal, NavServer* server)
     case li::NavigateGoal::TRAVERSE:
       ROS_DEBUG("Navigation START");
       ldg.request.id = goal->descriptor;
-      ros::service::call("lmi_laser_descriptor_getter", ldg);
+      ros::service::call("laser_descriptor_getter", ldg);
       // TODO: rewrite this file using the new Navigate.action.
       break;
   }
