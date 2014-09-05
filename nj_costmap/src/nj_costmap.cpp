@@ -2,7 +2,24 @@
  * Navigating jockey from local map
  *
  * The local map is centered on the laser scanner but its orientation is fixed.
- */
+ *
+ * The role of this jockey is to travel to the next crossing.
+ * The action is done when the robot reaches the crossing center.
+ * It is considered to be memory-less because it uses only an internal memory
+ * (in form of a local map) and do not interact with the large map.
+ *
+ * Interaction with the map:
+ * - Getter: none
+ * - Setter: none.
+ *
+ * Subscribers (other than map-related):
+ * - sensor_msg::LaserScan, "~/base_scan", 360-deg laser-scan.
+ *
+ * Publishers (other than map-related):
+ * - visualization_msgs::Marker, "~/crossing_marker", a sphere at the crossing center.
+ * - visualization_msgs::Marker, "~/exits_marker", lines from crossing center towards exits.
+*/
+
 
 #include <vector>
 #include <cmath>
@@ -16,13 +33,9 @@
 #include <geometry_msgs/Twist.h>
 #include <sensor_msgs/LaserScan.h>
 
-#include <lama_interfaces/NavigateAction.h>
-#include <lama_interfaces/GetVectorLaserScan.h>
-#include <lama_interfaces/SetVectorLaserScan.h>
+#include <lama_jockeys/NavigateAction.h>
 #include <nj_costmap/lmap_loc.h>
 #include <nj_costmap/visualization.h>
-
-namespace li = lama_interfaces;
 
 const double maxtheta = 1.6;
 const double max_distance = 3.0;
@@ -31,7 +44,7 @@ const double min_velocity = 0.020;
 const double kp_v = 0.05;  // Proportional gain for the linear velocity
 const double kp_w = 0.2;  // Proportional gain for the angular velocity
 
-typedef actionlib::SimpleActionServer<li::NavigateAction> NavServer;
+typedef actionlib::SimpleActionServer<lama_jockeys::NavigateAction> NavServer;
 
 ros::Publisher pub_twist;
 ros::Publisher marker;
@@ -152,21 +165,18 @@ void handleCostmap(nav_msgs::OccupancyGrid msg)
   }
 }
 
-bool executeNavigate(const li::NavigateGoalConstPtr& goal, NavServer* server)
+bool executeNavigate(const lama_jockeys::NavigateGoalConstPtr& goal, NavServer* server)
 {
-  li::GetVectorLaserScan ldg;
-  li::NavigateResult result;
+  lama_jockeys::NavigateResult result;
 
   switch (goal->action)
   {
-    case li::NavigateGoal::STOP:
+    case lama_jockeys::NavigateGoal::STOP:
       ROS_DEBUG("Navigation STOP");
       result.final_state = result.STOPPED;
       break;
-    case li::NavigateGoal::TRAVERSE:
+    case lama_jockeys::NavigateGoal::TRAVERSE:
       ROS_DEBUG("Navigation START");
-      ldg.request.id = goal->descriptor;
-      ros::service::call("laser_descriptor_getter", ldg);
       // TODO: rewrite this file using the new Navigate.action.
       break;
   }

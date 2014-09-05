@@ -11,7 +11,7 @@ find_package(catkin REQUIRED
 	tf
 	nav_msgs
 	geometry_msgs
-	lama_interfaces
+	lama_jockeys
 )
 
 ## System dependencies are found with CMake's conventions
@@ -86,7 +86,7 @@ find_package(ANN REQUIRED)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 	INCLUDE_DIRS include 3rdparty/Voronoi/include
-	CATKIN_DEPENDS ann roscpp actionlib tf nav_msgs geometry_msgs lama_interfaces
+	CATKIN_DEPENDS ann roscpp actionlib tf nav_msgs geometry_msgs lama_jockeys
 )
 
 ###########
@@ -114,14 +114,14 @@ include_directories(
 file(GLOB NJ_COSTMAP_SRC src/*.cpp)
 file(GLOB VORONOI_SRC 3rdparty/Voronoi/src/*.cc)
 set(SRC src/nj_costmap.cpp ${VORONOI_SRC} ${NJ_COSTMAP_SRC})
-add_executable(${PROJECT_NAME} ${SRC})
+add_executable(nj_costmap ${SRC})
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(${PROJECT_NAME} lama_interfaces)
+#add_dependencies(nj_costmap lama_jockeys)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(nj_costmap
 	${catkin_LIBRARIES}
 	${ANN_LIBRARIES}
 	)
