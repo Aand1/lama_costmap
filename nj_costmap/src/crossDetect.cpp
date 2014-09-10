@@ -2,19 +2,7 @@
  * Utility functions to detect crossing center and radius
  */
 
-#include <cmath>
-#include <map>
-#include <cstdint>
-
-#include <ros/ros.h>
-#include <nav_msgs/OccupancyGrid.h>
-#include <geometry_msgs/Point.h>
-
 #include "nj_costmap/crossDetect.h"
-#include "nj_costmap/lmap_loc_types.h"
-#include "nj_costmap/polygonUtils.h"
-#include "Voronoi.h"
-#include "ANN/ANN.h"
 
 //#define DEBUG_CROSSDETECT
 
@@ -23,7 +11,7 @@
 #endif
 
 namespace lama {
-namespace Laloc {
+namespace nj_costmap {
 
 // A map to store previously computed distances with ANN
 // first 16 bit = x * 100, last 16 bit = y * 100
@@ -34,9 +22,9 @@ typedef std::map<double, vector<size_t>> raycast_dict;
 
 /* Converts a scan to a list of Voronoi::Points
  */
-std::vector<Voronoi::Point> scanToVpoint(const std::vector<double>& scan)
+vector<Voronoi::Point> scanToVpoint(const vector<double>& scan)
 {
-	vector<Voronoi::Point> vpts;
+  vector<Voronoi::Point> vpts;
 	double scan_angle = FAKE_SCAN_START_ANGLE;
 	for(unsigned int i = 0; i < scan.size(); ++i)
 	{
@@ -102,7 +90,7 @@ inline double pixelAngle(const size_t row, const size_t col, const size_t nrow, 
  */
 vector<size_t> getRayCastToMapBorder(const double angle, const size_t nrow, const size_t ncol)
 {
-	vector<size_t> pts;
+  vector<size_t> pts;
 
 	// Twice the distance from map center to map corner.
 	const double r = std::sqrt((double) nrow * nrow + ncol * ncol);
@@ -118,8 +106,8 @@ vector<size_t> getRayCastToMapBorder(const double angle, const size_t nrow, cons
 	bool steep = (std::abs(dy) >= std::abs(dx));
 	if (steep)
 	{
-		swap(x0, y0);
-		swap(x1, y1);
+    std::swap(x0, y0);
+    std::swap(x1, y1);
 		// recompute Dx, Dy after swap
 		dx = x1 - x0;
 		dy = y1 - y0;
@@ -185,7 +173,7 @@ vector<size_t> rayLookup(const raycast_dict& raycast_lookup, const double angle)
 	double dangle_lower;
 	double dangle_upper;
 
-	auto upper_bound = raycast_lookup.upper_bound(angle);
+  raycast_dict::const_iterator upper_bound = raycast_lookup.upper_bound(angle);
 	if (upper_bound == raycast_lookup.begin())
 	{
 		return upper_bound->second;
@@ -207,7 +195,7 @@ vector<size_t> rayLookup(const raycast_dict& raycast_lookup, const double angle)
 	else
 	{
 		dangle_upper = upper_bound->first - angle;
-		auto lower_bound = upper_bound;
+    raycast_dict::const_iterator lower_bound = upper_bound;
 		lower_bound--;
 		dangle_lower = angle - lower_bound->first;
 		if (dangle_lower < dangle_upper)
@@ -231,7 +219,7 @@ vector<size_t> getRayCast(const double angle, const size_t nrow, const size_t nc
 {
 	// Store the ray casting up to the map border into a look-up table. Ray
 	// casting exclusively depends on the ray angle.
-	static map<double, vector<size_t>> raycast_lookup;
+	static std::map<double, vector<size_t>> raycast_lookup;
 	static bool raycast_lookup_cached;
 
 	if (!raycast_lookup_cached)
@@ -265,9 +253,10 @@ vector<size_t> getRayCast(const double angle, const size_t nrow, const size_t nc
  */
 double getRayRange(const nav_msgs::OccupancyGrid& map, const double angle, const double rmax)
 {
-	vector<size_t> ray = getRayCast(angle, map.info.height, map.info.width);
-	for (auto idx : ray)
+  vector<size_t> ray = getRayCast(angle, map.info.height, map.info.width);
+	for (size_t i = 0; i < ray.size(); ++i)
 	{
+    size_t idx = ray[i];
 		if (pointOccupied(map, idx))
 		{
 			double xcenter = (map.info.width / 2) * map.info.resolution;
@@ -286,9 +275,9 @@ double getRayRange(const nav_msgs::OccupancyGrid& map, const double angle, const
 
 /* Return a simulated 360° ranger output
  */
-std::vector<double> mapToScan(const nav_msgs::OccupancyGrid& map)
+vector<double> mapToScan(const nav_msgs::OccupancyGrid& map)
 {
-	std::vector<double> scan;
+	vector<double> scan;
 	scan.reserve((size_t) std::ceil(2 * M_PI / FAKE_SCAN_RESOLUTION));
 	double halfx = (double) map.info.width / 2;
 	double halfy = (double) map.info.height / 2;
@@ -312,11 +301,11 @@ std::vector<double> mapToScan(const nav_msgs::OccupancyGrid& map)
  * frontiers returned frontiers
  */
 void getFrontiers(
-	const vector<double> & scan, const double rt, const double dt, const double maxFrontierAngle,
-	std::vector<SFrontier> & frontiers)
+	const vector<double>& scan, const double rt, const double dt, const double maxFrontierAngle,
+	vector<SFrontier>& frontiers)
 {
-	vector<double> filtScan;
-	vector<int> angleNumber;
+  vector<double> filtScan;
+  vector<int> angleNumber;
 
 	// Filter out laser beams longer than rt
 	filtScan.reserve(scan.size());
@@ -415,23 +404,24 @@ int getIndex(const vector<double>& array, const double a)
 void filterVoronoiEdges(vector<VDEdge>& edges, const vector<Voronoi::Point>& pts)
 {
 
-	vector<VDEdge> newEdges;
+  vector<VDEdge> newEdges;
 
-	vector<double> angles;
+  vector<double> angles;
 	angles.reserve(pts.size());
 
 	double a;  // Point angle
 	double dr; // Point distance
-	for(auto pt : pts)
+	for(size_t i = 0; i < pts.size(); ++i)
 	{
-		a = std::atan2(pt.y, pt.x);
+		a = std::atan2(pts[i].y, pts[i].x);
 		angles.push_back(a);
 	}
 
 	const int pSize = pts.size();
 	
-	for(auto edge : edges)
+	for(size_t j = 0; j < edges.size(); ++j)
 	{
+    const VDEdge edge = edges[j];
 		const double x1 = edge.x1;
 		const double y1 = edge.y1;
 		const double x2 = edge.x2;
@@ -607,9 +597,9 @@ void getXingDesc(
 
 	// Get the Voronoi diagram. The crossing center will be one of the Voronoi nodes.
 	double relevanceFilterRadius = 0.15;
-	std::vector<double> scan = mapToScan(map);
-	std::vector<Voronoi::Point> pts = scanToVpoint(scan);
-	std::vector<Voronoi::Point> filt_pts(lama::PolygonUtils::filterRelevance(pts, relevanceFilterRadius));
+	vector<double> scan = mapToScan(map);
+	vector<Voronoi::Point> pts = scanToVpoint(scan);
+	vector<Voronoi::Point> filt_pts(lama::PolygonUtils::filterRelevance(pts, relevanceFilterRadius));
 
 	ROS_DEBUG("Number of scan points: %zu", pts.size());
 	ROS_DEBUG("Number of filtered scan points: %zu", filt_pts.size());
@@ -724,5 +714,5 @@ void getXingDesc(
 }
 
 
-} // namespace Laloc
+} // namespace nj_costmap
 } // namespace lama

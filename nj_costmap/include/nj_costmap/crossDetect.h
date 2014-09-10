@@ -1,26 +1,36 @@
 #ifndef _NJ_COSTMAP_CROSSDETECT_H_
 #define _NJ_COSTMAP_CROSSDETECT_H_
 
-#include <nav_msgs/OccupancyGrid.h>
+#include <cmath>
+#include <map>
+#include <cstdint>
 
-#include "Voronoi.h"
+#include <ros/ros.h>
+#include <nav_msgs/OccupancyGrid.h>
+#include <geometry_msgs/Point.h>
+
 #include "nj_costmap/lmap_loc_types.h"
+#include "nj_costmap/polygonUtils.h"
+#include "Voronoi.h"
+#include "ANN/ANN.h"
 
 #define FAKE_SCAN_START_ANGLE (-M_PI)
 #define FAKE_SCAN_RESOLUTION  0.017453293 // (rad), 1 deg
 #define OCCUPIED_THRESHOLD 40 // 0 = free, 100 = occupied
 
 namespace lama {
-namespace Laloc {
+namespace nj_costmap {
+
+using std::vector;
 
 void getXingDesc(
 		const nav_msgs::OccupancyGrid& map, const double dt, const double maxFrontierAngle,
-		double& cx, double& cy, double& radius, std::vector<SFrontier>& frontiers);
+		double& cx, double& cy, double& radius, vector<SFrontier>& frontiers);
 
 
-std::vector<double> mapToScan(const nav_msgs::OccupancyGrid& map);
+vector<double> mapToScan(const nav_msgs::OccupancyGrid& map);
 
-} // namespace Laloc
+} // namespace nj_costmap
 } // namespace lama
 
 #endif // #ifndef _NJ_COSTMAP_CROSSDETECT_H_

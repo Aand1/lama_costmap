@@ -2,7 +2,7 @@
 
 #include <nj_costmap/visualization.h>
 
-#include <nj_costmap/crossDetect.h> // for the fake laser
+#include <nj_costmap/crossDetect.h> // for the fake laser (mapToScan)
 
 /* Return the marker for the visualization of the crossing center
  */
@@ -27,7 +27,7 @@ visualization_msgs::Marker getXingMarker(const std::string& frame_id, const doub
 
 /* Return the marker for the visualization of the roads
  */
-visualization_msgs::Marker getRoadsMarker(const std::string& frame_id, const std::vector<double>& angles, const double length)
+visualization_msgs::Marker getRoadsMarker(const std::string& frame_id, const double x, const double y, const std::vector<double>& angles, const double length)
 {
 	visualization_msgs::Marker m;
 	m.header.frame_id = frame_id;
@@ -39,12 +39,14 @@ visualization_msgs::Marker getRoadsMarker(const std::string& frame_id, const std
 	m.color.g = 0.0;
 	m.color.b = 1.0;
 	m.color.a = 0.5;
-	for(auto angle : angles)
+  for(size_t i = 0; i < angles.size(); ++i)
 	{
 		geometry_msgs::Point p;
+    p.x = x;
+    p.y = y;
 		m.points.push_back(p);
-		p.x = length * cos(angle);
-		p.y = length * sin(angle);
+		p.x = x + length * cos(angles[i]);
+		p.y = y + length * sin(angles[i]);
 		m.points.push_back(p);
 	}
 	return m;
@@ -54,7 +56,7 @@ sensor_msgs::LaserScan getFakeLaser(nav_msgs::OccupancyGrid& msg)
 {
 	sensor_msgs::LaserScan scan;
 
-	std::vector<double> scanPts = lama::Laloc::mapToScan(msg);
+	std::vector<double> scanPts = lama::nj_costmap::mapToScan(msg);
 	static uint32_t seq = 0;
 	scan.header.seq = seq++;
 	scan.header.frame_id = msg.header.frame_id;

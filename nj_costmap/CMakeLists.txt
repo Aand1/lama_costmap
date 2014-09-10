@@ -86,7 +86,8 @@ find_package(ANN REQUIRED)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 	INCLUDE_DIRS include 3rdparty/Voronoi/include
-	CATKIN_DEPENDS ann roscpp actionlib tf nav_msgs geometry_msgs lama_jockeys
+	CATKIN_DEPENDS roscpp actionlib tf nav_msgs geometry_msgs lama_jockeys
+	DEPENDS ann
 )
 
 ###########
@@ -111,9 +112,12 @@ include_directories(
 #)
 
 ## Declare a cpp executable
-file(GLOB NJ_COSTMAP_SRC src/*.cpp)
 file(GLOB VORONOI_SRC 3rdparty/Voronoi/src/*.cc)
-set(SRC src/nj_costmap.cpp ${VORONOI_SRC} ${NJ_COSTMAP_SRC})
+set(SRC ${SRC} src/crossDetect.cpp)
+set(SRC ${SRC} src/lmap_loc.cpp)
+set(SRC ${SRC} src/visualization.cpp)
+set(SRC ${SRC} src/polygonUtils.cpp)
+set(SRC src/nj_costmap_node.cpp ${VORONOI_SRC} ${SRC})
 add_executable(nj_costmap ${SRC})
 
 ## Add cmake target dependencies of the executable/library

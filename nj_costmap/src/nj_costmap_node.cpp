@@ -50,7 +50,7 @@ ros::Publisher pub_twist;
 ros::Publisher marker;
 ros::Publisher roadMarker;
 ros::Publisher fakeLaserMarker;
-lama::Laloc::LMapLoc loc;
+lama::nj_costmap::LMapLoc loc;
 
 std::string odom_frame;
 
@@ -153,7 +153,8 @@ void handleCostmap(nav_msgs::OccupancyGrid msg)
   if (roadMarker.getNumSubscribers())
   {
     std::vector<double> exitAngles = loc.getExitAngles();
-    visualization_msgs::Marker ml = getRoadsMarker(msg.header.frame_id, exitAngles, loc.getCrossRadius());
+    visualization_msgs::Marker ml = getRoadsMarker(msg.header.frame_id, loc.getCrossCenterX(), loc.getCrossCenterY(),
+        exitAngles, loc.getCrossRadius());
     roadMarker.publish(ml);
   }
 

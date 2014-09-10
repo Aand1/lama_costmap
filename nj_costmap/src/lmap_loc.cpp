@@ -5,7 +5,7 @@
 #include "nj_costmap/crossDetect.h"
 
 namespace lama {
-namespace Laloc {
+namespace nj_costmap {
 
 LMapLoc::LMapLoc() :
 	m_cx(0.0),
@@ -16,12 +16,9 @@ LMapLoc::LMapLoc() :
 
 void LMapLoc::crossDetect(nav_msgs::OccupancyGrid map)
 {
-	//struct rusage t1, t2;
 
 	// Get the crossing center.
-	//getTime(&t1);
 	getXingDesc(map, m_frontier_width, 45 * M_PI / 180.0, m_cx, m_cy, m_cr, m_frontiers);
-	//getTime(&t2);
 
 	m_crossDescriptor.clear();
 	m_crossDescriptor.push_back(m_cx);
@@ -68,5 +65,5 @@ void LMapLoc::setFrontierWidth(double frontier_width)
 	m_frontier_width = frontier_width;
 }
 
-} // namespace Laloc
+} // namespace nj_costmap
 } // namespace lama

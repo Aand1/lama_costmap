@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
   <arg name="model" default="$(find lama_test)/worlds/stage-270.world" />
-  <arg name="debug" default="false" />
+  <!-- Launch nj_costmap if launch_nj is true, don't launch it otherwise. -->
   <arg name="launch_nj" default="true" />
 
   <!--
@@ -43,7 +43,4 @@
     </node>
   </group>
 
-  <group if="$(arg debug)">
-    <node name="rqt_graph" pkg="rqt_graph" type="rqt_graph" />
-  </group>
 </launch>

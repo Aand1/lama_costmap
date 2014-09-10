@@ -6,7 +6,7 @@
 #include "nj_costmap/lmap_loc_types.h"
 
 namespace lama {
-namespace Laloc {
+namespace nj_costmap {
 
 class LMapLoc {
 	public:
@@ -33,7 +33,7 @@ class LMapLoc {
 
 };
 
-} // namespace Laloc
+} // namespace nj_costmap
 } // namespace lama
 
 #endif // _NJ_COSTMAP_LMAP_LOC_H_

@@ -7,7 +7,7 @@
 
 visualization_msgs::Marker getXingMarker(const std::string& frame_id, const double x, const double y, const double radius);
 
-visualization_msgs::Marker getRoadsMarker(const std::string& frame_id, const std::vector<double>& angles, const double length);
+visualization_msgs::Marker getRoadsMarker(const std::string& frame_id, const double x, const double y, const std::vector<double>& angles, const double length);
 
 sensor_msgs::LaserScan getFakeLaser(nav_msgs::OccupancyGrid& msg);
 
