@@ -9,10 +9,13 @@
 #include <nav_msgs/OccupancyGrid.h>
 #include <geometry_msgs/Point.h>
 
-#include "nj_costmap/lmap_loc_types.h"
-#include "nj_costmap/polygonUtils.h"
-#include "Voronoi.h"
-#include "ANN/ANN.h"
+#include <lama_msgs/Crossing.h>
+#include <lama_msgs/Frontier.h>
+
+#include <nj_costmap/lmap_loc_types.h>
+#include <nj_costmap/polygonUtils.h>
+#include <Voronoi.h>
+#include <ANN/ANN.h>
 
 #define FAKE_SCAN_START_ANGLE (-M_PI)
 #define FAKE_SCAN_RESOLUTION  0.017453293 // (rad), 1 deg
@@ -23,10 +26,8 @@ namespace nj_costmap {
 
 using std::vector;
 
-void getXingDesc(
-		const nav_msgs::OccupancyGrid& map, const double dt, const double maxFrontierAngle,
-		double& cx, double& cy, double& radius, vector<SFrontier>& frontiers);
-
+lama_msgs::Crossing getXingDesc(
+		const nav_msgs::OccupancyGrid& map, const double dt, const double maxFrontierAngle);
 
 vector<double> mapToScan(const nav_msgs::OccupancyGrid& map);
 

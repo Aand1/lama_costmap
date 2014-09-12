@@ -5,10 +5,14 @@
 #include <nav_msgs/OccupancyGrid.h>
 #include <visualization_msgs/Marker.h>
 
-visualization_msgs::Marker getXingMarker(const std::string& frame_id, const double x, const double y, const double radius);
+#include <nj_costmap/crossing_detector_helper.h> // for the fake laser (mapToScan)
 
-visualization_msgs::Marker getRoadsMarker(const std::string& frame_id, const double x, const double y, const std::vector<double>& angles, const double length);
+namespace lama {
+namespace nj_costmap {
 
-sensor_msgs::LaserScan getFakeLaser(nav_msgs::OccupancyGrid& msg);
+sensor_msgs::LaserScan getFakeLaser(const nav_msgs::OccupancyGrid& msg);
+
+} // namespace nj_costmap
+} // namespace lama
 
 #endif // #ifndef __NJ_COSTMAP_VISUALIZATION_H__

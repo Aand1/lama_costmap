@@ -2,7 +2,7 @@
  * Utility functions to detect crossing center and radius
  */
 
-#include "nj_costmap/crossDetect.h"
+#include <nj_costmap/crossing_detector_helper.h>
 
 //#define DEBUG_CROSSDETECT
 
@@ -293,8 +293,8 @@ vector<double> mapToScan(const nav_msgs::OccupancyGrid& map)
 /* return frontiers
  *
  * scan laser ranges
- * rt max range for a laser beam to be considered
- * dt min frontier width
+ * rt maximum range for a laser beam to be considered
+ * dt minimum frontier width
  * maxFrontierAngle max. allowed frontier angle in radians (0 means angle
  *                  between frontier and line from robot to frontier middle is
  *                  90 deg).
@@ -302,7 +302,7 @@ vector<double> mapToScan(const nav_msgs::OccupancyGrid& map)
  */
 void getFrontiers(
 	const vector<double>& scan, const double rt, const double dt, const double maxFrontierAngle,
-	vector<SFrontier>& frontiers)
+	vector<lama_msgs::Frontier>& frontiers)
 {
   vector<double> filtScan;
   vector<int> angleNumber;
@@ -310,15 +310,17 @@ void getFrontiers(
 	// Filter out laser beams longer than rt
 	filtScan.reserve(scan.size());
 	angleNumber.reserve(scan.size());
-	for(int i = 0; i < scan.size(); i++) {
-		if (scan[i] < rt) {
+	for(size_t i = 0; i < scan.size(); i++)
+  {
+		if (scan[i] < rt)
+    {
 			filtScan.push_back(scan[i]);
 			angleNumber.push_back(i);
 		}
 	}
 
-
-	if (filtScan.size() == 0) {
+	if (filtScan.size() == 0)
+  {
 		ROS_ERROR("All points from scan are above threshold");
 		return;
 	}
@@ -330,33 +332,40 @@ void getFrontiers(
 	}
 
 	double aAngle, bAngle;
-	SPoint a, b;
-	aAngle = angleNumber[0] * FAKE_SCAN_RESOLUTION;
-	a.x = filtScan[0] * std::cos(FAKE_SCAN_START_ANGLE + aAngle);
-	a.y = filtScan[0] * std::sin(FAKE_SCAN_START_ANGLE + aAngle);
+  geometry_msgs::Point a;
+  geometry_msgs::Point b;
+	aAngle = FAKE_SCAN_START_ANGLE + angleNumber[0] * FAKE_SCAN_RESOLUTION;
+	a.x = filtScan[0] * std::cos(aAngle);
+	a.y = filtScan[0] * std::sin(aAngle);
 
-	double dist;
+	double dist2;
 	frontiers.clear();
 
-	for(int i = 1; i < filtScan.size() + 1; i++)
+	for(size_t i = 1; i < filtScan.size() + 1; i++)
 	{
-		int j = i % filtScan.size();
-		bAngle = angleNumber[j] * FAKE_SCAN_RESOLUTION;
-		b.x = filtScan[j] * std::cos(FAKE_SCAN_START_ANGLE + bAngle);
-		b.y = filtScan[j] * std::sin(FAKE_SCAN_START_ANGLE + bAngle);
-		dist = (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
+		size_t j = i % filtScan.size();
+		bAngle = FAKE_SCAN_START_ANGLE + angleNumber[j] * FAKE_SCAN_RESOLUTION;
+		b.x = filtScan[j] * std::cos(bAngle);
+		b.y = filtScan[j] * std::sin(bAngle);
+		dist2 = (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
 
-		if (dist > dt*dt)
+		if (dist2 > dt*dt)
 		{
 			double sx = (a.x + b.x) / 2.0;
 			double sy = (a.y + b.y) / 2.0;
 
 			double distToFrontierCenter = std::sqrt(sx * sx + sy * sy);
 			double dotProductFrontierSxSy = (b.x - a.x) * sx + (b.y - a.y) * sy;
+      double dist = std::sqrt(dist2);
 			double frontierAngleWithSxSy = std::acos(dotProductFrontierSxSy / dist / distToFrontierCenter);
-			if (fabs(M_PI_2 - frontierAngleWithSxSy) < maxFrontierAngle)
+			if (std::abs(M_PI_2 - frontierAngleWithSxSy) < maxFrontierAngle)
 			{
-				frontiers.push_back(SFrontier(a, b, std::sqrt(dist), std::atan2(sy, sx)));
+        lama_msgs::Frontier frontier;
+        frontier.p1 = a;
+        frontier.p2 = b;
+        frontier.width = dist;
+        frontier.angle = std::atan2(sy, sx);
+				frontiers.push_back(frontier);
 			}
 		}
 		a.x = b.x;
@@ -577,22 +586,18 @@ vector<CenterC> getFreeSpace(const vector<VDEdge>& edges, const vector<Voronoi::
 }
 
 /**
-  * return the crossing center determined by Voronoi diagram.
-  * The center is returned as triplet (cx,cy,r) where cx,cy is the center
-  * of circle with radius 'r'. if no center is detected, the triplet (0,0,-1)
-  * is returned.
+  * return the Crossing determined by Voronoi diagram.
+  * If no crossing center is detected, the crossing radius is set to -1.
   */
-void getXingDesc(
-		const nav_msgs::OccupancyGrid& map, const double dt, const double maxFrontierAngle,
-		double& cx, double& cy, double& radius, vector<SFrontier>& frontiers)
+lama_msgs::Crossing getXingDesc(
+		const nav_msgs::OccupancyGrid& map, const double dt, const double maxFrontierAngle)
 {
+  lama_msgs::Crossing crossing;
+
 	if (map.data.size() == 0)
 	{
-		frontiers.clear();
-		cx = 0;
-		cy = 0;
-		radius = -1;
-		return;
+    crossing.radius = -1;
+    return crossing;
 	}
 
 	// Get the Voronoi diagram. The crossing center will be one of the Voronoi nodes.
@@ -647,6 +652,7 @@ void getXingDesc(
 #ifdef DEBUG_CROSSDETECT
 	// Cf. tests/debug_plots.py
 	// "cd /tmp; python $(rospack find nj_costmap)/tests/debug_plots.py"
+  // "cd /tmp; python $(rospack find nj_costmap)/tests/debug_plots.py pts filt_pts edges filt_edges candidates"
 	std::ofstream ofs_pts("/tmp/pts.dat");
 	for (auto pt : pts)
 	{
@@ -684,8 +690,8 @@ void getXingDesc(
 
 	// Find the Voronoi vertex with the largest free space around it, this will
 	// be the crossing center.
-	unsigned int idx_maxr = 0;
-	for(unsigned int i = 0; i < candidates.size(); i++)
+	size_t idx_maxr = 0;
+	for (size_t i = 0; i < candidates.size(); i++)
 	{
 		if (candidates[i].r > candidates[idx_maxr].r)
 		{
@@ -695,22 +701,23 @@ void getXingDesc(
 
 	if (candidates.size() > 0)
 	{
-		cx = candidates[idx_maxr].x;
-		cy = candidates[idx_maxr].y;
-		radius = sqrt(candidates[idx_maxr].r);
+		crossing.center.x = candidates[idx_maxr].x;
+		crossing.center.y = candidates[idx_maxr].y;
+		crossing.radius = sqrt(candidates[idx_maxr].r);
 	}
 	else
 	{
-		cx = 0;
-		cy = 0;
-		radius = -1;
+		crossing.center.x = candidates[idx_maxr].x;
+		crossing.center.y = candidates[idx_maxr].y;
+		crossing.radius = sqrt(candidates[idx_maxr].r);
 	}
 
 	// Get the frontiers.
-	getFrontiers(scan, 1.4 * radius, dt, maxFrontierAngle, frontiers);
-	ROS_DEBUG("Number of frontiers: %zu", frontiers.size());
+	getFrontiers(scan, 1.4 * crossing.radius, dt, maxFrontierAngle, crossing.frontiers);
+	ROS_DEBUG("Number of frontiers: %zu", crossing.frontiers.size());
 	
 	delete vd;
+  return crossing;
 }
 
 

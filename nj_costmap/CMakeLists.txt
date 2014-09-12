@@ -6,12 +6,15 @@ project(nj_costmap)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED
 	COMPONENTS
-	roscpp
 	actionlib
-	tf
-	nav_msgs
+	actionlib_msgs
 	geometry_msgs
+	goto_crossing
 	lama_jockeys
+	lama_msgs
+	nav_msgs
+	roscpp
+	tf
 )
 
 ## System dependencies are found with CMake's conventions
@@ -86,7 +89,7 @@ find_package(ANN REQUIRED)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 	INCLUDE_DIRS include 3rdparty/Voronoi/include
-	CATKIN_DEPENDS roscpp actionlib tf nav_msgs geometry_msgs lama_jockeys
+	CATKIN_DEPENDS actionlib actionlib_msgs geometry_msgs goto_crossing lama_jockeys lama_msgs nav_msgs roscpp tf
 	DEPENDS ann
 )
 
@@ -113,10 +116,11 @@ include_directories(
 
 ## Declare a cpp executable
 file(GLOB VORONOI_SRC 3rdparty/Voronoi/src/*.cc)
-set(SRC ${SRC} src/crossDetect.cpp)
-set(SRC ${SRC} src/lmap_loc.cpp)
-set(SRC ${SRC} src/visualization.cpp)
+set(SRC ${SRC} src/jockey.cpp)
+set(SRC ${SRC} src/crossing_detector.cpp)
+set(SRC ${SRC} src/crossing_detector_helper.cpp)
 set(SRC ${SRC} src/polygonUtils.cpp)
+set(SRC ${SRC} src/visualization.cpp)
 set(SRC src/nj_costmap_node.cpp ${VORONOI_SRC} ${SRC})
 add_executable(nj_costmap ${SRC})
 
