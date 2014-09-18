@@ -39,9 +39,9 @@
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>libann-dev</build_depend>
   <build_depend>actionlib</build_depend>
   <build_depend>actionlib_msgs</build_depend>
+  <build_depend>crossing_detector</build_depend>
   <build_depend>geometry_msgs</build_depend>
   <build_depend>goto_crossing</build_depend>
   <build_depend>lama_jockeys</build_depend>
@@ -50,9 +50,9 @@
   <build_depend>roscpp</build_depend>
   <build_depend>tf</build_depend>
   <build_depend>visualization_msgs</build_depend>
-  <run_depend>libann</run_depend>
   <run_depend>actionlib</run_depend>
   <run_depend>actionlib_msgs</run_depend>
+  <run_depend>crossing_detector</run_depend>
   <run_depend>geometry_msgs</run_depend>
   <run_depend>goto_crossing</run_depend>
   <run_depend>lama_jockeys</run_depend>

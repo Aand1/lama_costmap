@@ -8,6 +8,7 @@ find_package(catkin REQUIRED
 	COMPONENTS
 	actionlib
 	actionlib_msgs
+	crossing_detector
 	geometry_msgs
 	goto_crossing
 	lama_jockeys
@@ -18,8 +19,7 @@ find_package(catkin REQUIRED
 )
 
 ## System dependencies are found with CMake's conventions
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
-find_package(ANN REQUIRED)
+#find_package(ANN REQUIRED)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -88,25 +88,22 @@ find_package(ANN REQUIRED)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-	INCLUDE_DIRS include 3rdparty/Voronoi/include
+	INCLUDE_DIRS include
 	CATKIN_DEPENDS actionlib actionlib_msgs geometry_msgs goto_crossing lama_jockeys lama_msgs nav_msgs roscpp tf
-	DEPENDS ann
 )
 
 ###########
 ## Build ##
 ###########
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 # include_directories(include)
 include_directories(
   include
-  3rdparty/Voronoi/include
   ${catkin_INCLUDE_DIRS}
-  ${ANN_INCLUDE_DIRS}
 )
 
 ## Declare a cpp library
@@ -115,13 +112,8 @@ include_directories(
 #)
 
 ## Declare a cpp executable
-file(GLOB VORONOI_SRC 3rdparty/Voronoi/src/*.cc)
 set(SRC ${SRC} src/jockey.cpp)
-set(SRC ${SRC} src/crossing_detector.cpp)
-set(SRC ${SRC} src/crossing_detector_helper.cpp)
-set(SRC ${SRC} src/polygonUtils.cpp)
-set(SRC ${SRC} src/visualization.cpp)
-set(SRC src/nj_costmap_node.cpp ${VORONOI_SRC} ${SRC})
+set(SRC src/nj_costmap_node.cpp ${SRC})
 add_executable(nj_costmap ${SRC})
 
 ## Add cmake target dependencies of the executable/library
@@ -129,10 +121,7 @@ add_executable(nj_costmap ${SRC})
 #add_dependencies(nj_costmap lama_jockeys)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(nj_costmap
-	${catkin_LIBRARIES}
-	${ANN_LIBRARIES}
-	)
+target_link_libraries(nj_costmap ${catkin_LIBRARIES})
 
 #############
 ## Install ##

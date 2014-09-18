@@ -13,18 +13,18 @@ Jockey::Jockey(const std::string& name, const double frontier_width) :
   pub_twist_ = private_nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
 	pub_crossing_marker_ = private_nh_.advertise<visualization_msgs::Marker>("crossing_marker", 50, true);
   pub_exits_marker_ = private_nh_.advertise<visualization_msgs::Marker> ("exits_marker", 50, true);
-  pub_fake_laser_ = private_nh_.advertise<sensor_msgs::LaserScan>("fake_scan", 50, true);
+  pub_place_profile = private_nh_.advertise<sensor_msgs::PointCloud>("place_profile", 50, true);
   pub_crossing_ = private_nh_.advertise<lama_msgs::Crossing>("abs_crossing", 50, true);
 }
 
 void Jockey::onTraverse()
 {
-  ROS_DEBUG("%s: Received action TRAVERSE", ros::this_node::getName().c_str());
+  ROS_INFO("%s: Received action TRAVERSE", ros::this_node::getName().c_str());
   crossing_goer_.resetIntegrals();
   costmap_handler_ = private_nh_.subscribe("local_costmap", 1, &Jockey::handleCostmap, this);
   ROS_DEBUG("Costmap handler started");
   
-  ros::Rate r(50);
+  ros::Rate r(10);
   while (true)
   {
     if (server_.isPreemptRequested() && !ros::ok())
@@ -74,7 +74,7 @@ void Jockey::onContinue()
 
 void Jockey::handleCostmap(const nav_msgs::OccupancyGridConstPtr& msg)
 {
-  abs_crossing_ = crossing_detector_.detectCrossing(*msg);
+  abs_crossing_ = crossing_detector_.crossingDescriptor(*msg);
  
   ROS_DEBUG("%s: crossing (%.3f, %.3f, %.3f), number of exits: %zu", ros::this_node::getName().c_str(),
         abs_crossing_.center.x, abs_crossing_.center.y, abs_crossing_.radius, abs_crossing_.frontiers.size());
@@ -118,14 +118,14 @@ void Jockey::handleCostmap(const nav_msgs::OccupancyGridConstPtr& msg)
     pub_exits_marker_.publish(m);
   }
 
-  // Fake laser.
-  if (pub_fake_laser_.getNumSubscribers())
+  // PlaceProfile visualization message.
+  if (pub_place_profile.getNumSubscribers())
   {
-    sensor_msgs::LaserScan scan = getFakeLaser(*msg);
-    pub_fake_laser_.publish(scan);
+    sensor_msgs::PointCloud cloud = placeProfileToPointCloud(crossing_detector_.getPlaceProfile());
+    pub_place_profile.publish(cloud);
   }
 
-  pub_crossing_.publish(crossing_detector_.getCrossingDescriptor());
+  pub_crossing_.publish(rel_crossing_);
 }
 
 } // namespace nj_costmap

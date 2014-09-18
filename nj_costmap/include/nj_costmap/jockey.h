@@ -21,7 +21,7 @@
  * - geometry_msgs/Twist, "~/cmd_vel", robot set velocity
  * - visualization_msgs/Marker, "~/crossing_marker", a sphere at the crossing center.
  * - visualization_msgs/Marker, "~/exits_marker", lines from crossing center towards exits.
- * - sensor_msgs/LaserScan, "~/fake_scan", 360-deg laser-scan (TODO: absolute or relative orientation?).
+ * - sensor_msgs/PointCloud, "~/place_profile", point clound representing the place profile.
  * - lama_msgs/Crossing, "~/abs_crossing", Crossing with absolute frontier angles.
  *
  * Services used (other than map-related):
@@ -37,17 +37,16 @@
 #include <tf/tf.h>
 #include <tf/transform_listener.h>
 #include <tf/transform_datatypes.h>  // for getYaw()
-#include <sensor_msgs/LaserScan.h>
+#include <sensor_msgs/PointCloud.h>
 #include <nav_msgs/OccupancyGrid.h>
 
 #include <lama_jockeys/navigating_jockey.h>
 #include <lama_msgs/Crossing.h>
 #include <lama_msgs/crossing_utils.h>
 #include <lama_msgs/crossing_visualization.h>
+#include <lama_msgs/place_profile_conversions.h>
 #include <goto_crossing/crossing_goer.h>
-
-#include <nj_costmap/crossing_detector.h>
-#include <nj_costmap/visualization.h>
+#include <crossing_detector/costmap_crossing_detector.h>
 
 namespace lama {
 namespace nj_costmap {
@@ -70,7 +69,7 @@ class Jockey : public lama::NavigatingJockey
     ros::Publisher pub_crossing_marker_;
     ros::Publisher pub_exits_marker_;
     ros::Publisher pub_twist_;
-    ros::Publisher pub_fake_laser_;
+    ros::Publisher pub_place_profile;
     ros::Publisher pub_crossing_;
     
     ros::Subscriber costmap_handler_;
@@ -80,7 +79,7 @@ class Jockey : public lama::NavigatingJockey
     lama_msgs::Crossing abs_crossing_;  //!> Crossing descriptor with relative position and absolute angle.
     lama_msgs::Crossing rel_crossing_;  //!> Crossing descriptor with relative position and relative angle.
 
-    lama::nj_costmap::CrossingDetector crossing_detector_;
+    lama::crossing_detector::CostmapCrossingDetector crossing_detector_;
     goto_crossing::CrossingGoer crossing_goer_;
 };
 
