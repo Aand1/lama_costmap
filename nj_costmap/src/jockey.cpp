@@ -4,7 +4,8 @@ namespace lama {
 namespace nj_costmap {
 
 Jockey::Jockey(const std::string& name, const double frontier_width) :
-  lama::NavigatingJockey(name),
+  NavigatingJockey(name),
+  has_crossing_(false),
   crossing_detector_(frontier_width)
 {
   if (!private_nh_.getParam("odom_frame", odom_frame_))
@@ -13,18 +14,18 @@ Jockey::Jockey(const std::string& name, const double frontier_width) :
   pub_twist_ = private_nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
 	pub_crossing_marker_ = private_nh_.advertise<visualization_msgs::Marker>("crossing_marker", 50, true);
   pub_exits_marker_ = private_nh_.advertise<visualization_msgs::Marker> ("exits_marker", 50, true);
-  pub_place_profile = private_nh_.advertise<sensor_msgs::PointCloud>("place_profile", 50, true);
+  pub_place_profile_ = private_nh_.advertise<sensor_msgs::PointCloud>("place_profile", 50, true);
   pub_crossing_ = private_nh_.advertise<lama_msgs::Crossing>("abs_crossing", 50, true);
 }
 
 void Jockey::onTraverse()
 {
-  ROS_INFO("%s: Received action TRAVERSE", ros::this_node::getName().c_str());
+  ROS_INFO("%s: Received action TRAVERSE or CONTINUE", ros::this_node::getName().c_str());
   crossing_goer_.resetIntegrals();
   costmap_handler_ = private_nh_.subscribe("local_costmap", 1, &Jockey::handleCostmap, this);
   ROS_DEBUG("Costmap handler started");
   
-  ros::Rate r(10);
+  ros::Rate r(100);
   while (true)
   {
     if (server_.isPreemptRequested() && !ros::ok())
@@ -35,17 +36,21 @@ void Jockey::onTraverse()
       break;
     }
 
-    geometry_msgs::Twist twist;
-    bool goal_reached = crossing_goer_.goto_crossing(rel_crossing_, twist);
-    pub_twist_.publish(twist);
-    ROS_DEBUG("twist (%.3f, %.3f)", twist.linear.x, twist.angular.z);
-    //pub_twist_.publish(geometry_msgs::Twist());
-
-    if (goal_reached)
+    if (has_crossing_)
     {
-      result_.final_state = result_.DONE;
-      result_.completion_time = getCompletionDuration();
-      server_.setSucceeded(result_);
+      geometry_msgs::Twist twist;
+      bool goal_reached = crossing_goer_.goto_crossing(rel_crossing_, twist);
+      pub_twist_.publish(twist);
+      ROS_DEBUG("twist (%.3f, %.3f)", twist.linear.x, twist.angular.z);
+
+      if (goal_reached)
+      {
+        result_.final_state = result_.DONE;
+        result_.completion_time = getCompletionDuration();
+        server_.setSucceeded(result_);
+        break;
+      }
+      has_crossing_ = false;
     }
     ros::spinOnce();
     r.sleep();
@@ -55,7 +60,7 @@ void Jockey::onTraverse()
 
 void Jockey::onStop()
 {
-  ROS_DEBUG("%s: Received action STOP", ros::this_node::getName().c_str());
+  ROS_DEBUG("%s: Received action STOP or INTERRUPT", ros::this_node::getName().c_str());
   costmap_handler_.shutdown();
   result_.final_state = result_.DONE;
   result_.completion_time = ros::Duration(0.0);
@@ -64,11 +69,13 @@ void Jockey::onStop()
 
 void Jockey::onInterrupt()
 {
+  ROS_DEBUG("%s: Received action INTERRUPT", ros::this_node::getName().c_str());
   onStop();
 }
 
 void Jockey::onContinue()
 {
+  ROS_DEBUG("%s: Received action CONTINUE", ros::this_node::getName().c_str());
   onTraverse();
 }
 
@@ -100,6 +107,7 @@ void Jockey::handleCostmap(const nav_msgs::OccupancyGridConstPtr& msg)
   // Transform the crossing with absolute angles to relative angles.
   rel_crossing_ = abs_crossing_;
   rotateCrossing(map_relative_orientation_, rel_crossing_);
+  has_crossing_ = true;
 
   for (size_t i = 0; i < rel_crossing_.frontiers.size(); ++i)
     ROS_DEBUG("Frontier angle = %.3f", rel_crossing_.frontiers[i].angle);
@@ -119,10 +127,10 @@ void Jockey::handleCostmap(const nav_msgs::OccupancyGridConstPtr& msg)
   }
 
   // PlaceProfile visualization message.
-  if (pub_place_profile.getNumSubscribers())
+  if (pub_place_profile_.getNumSubscribers())
   {
     sensor_msgs::PointCloud cloud = placeProfileToPointCloud(crossing_detector_.getPlaceProfile());
-    pub_place_profile.publish(cloud);
+    pub_place_profile_.publish(cloud);
   }
 
   pub_crossing_.publish(rel_crossing_);

@@ -51,7 +51,7 @@
 namespace lama {
 namespace nj_costmap {
 
-class Jockey : public lama::NavigatingJockey
+class Jockey : public NavigatingJockey
 {
   public:
 
@@ -66,16 +66,19 @@ class Jockey : public lama::NavigatingJockey
 
   private:
 
+    // Publishers and subscribers.
     ros::Publisher pub_crossing_marker_;
     ros::Publisher pub_exits_marker_;
     ros::Publisher pub_twist_;
-    ros::Publisher pub_place_profile;
+    ros::Publisher pub_place_profile_;
     ros::Publisher pub_crossing_;
     
     ros::Subscriber costmap_handler_;
 
+    // Internals.
     std::string odom_frame_;
     double map_relative_orientation_;  //!> angle from LaserScan (on which the map is base) to the map.
+    bool has_crossing_;  //!> true when a new crossing was computed.
     lama_msgs::Crossing abs_crossing_;  //!> Crossing descriptor with relative position and absolute angle.
     lama_msgs::Crossing rel_crossing_;  //!> Crossing descriptor with relative position and relative angle.
 

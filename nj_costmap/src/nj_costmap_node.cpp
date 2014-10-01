@@ -21,7 +21,7 @@
 int main(int argc, char **argv)
 {
   // Debug log level
-  if(ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug))
+  if(ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info))
   {
     ros::console::notifyLoggerLevelsChanged();
   }
@@ -45,9 +45,8 @@ int main(int argc, char **argv)
       ros::this_node::getName() + "_server");
 
   lama::nj_costmap::Jockey jockey(navigating_jockey_name, frontier_width);
-  ROS_DEBUG("JOCKEY server: %s", jockey.getName().c_str());
 
-  ROS_INFO("navigating jockey with cost map started");
+  ROS_INFO("%s started (with server %s)", ros::this_node::getName().c_str(), jockey.getName().c_str());
   ros::spin();
 
   return 0;
