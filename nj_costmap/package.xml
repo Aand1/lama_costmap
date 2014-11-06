@@ -2,7 +2,10 @@
 <package>
   <name>nj_costmap</name>
   <version>0.0.0</version>
-  <description>The nj_costmap package</description>
+  <description>The nj_costmap package implements a navigation jockey for the
+	  Large Maps framework (LaMa) based on a local costmap (costmap position is
+	  relative to the sensor but orientation is absolute).
+  </description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->
@@ -39,8 +42,6 @@
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>actionlib</build_depend>
-  <build_depend>actionlib_msgs</build_depend>
   <build_depend>crossing_detector</build_depend>
   <build_depend>geometry_msgs</build_depend>
   <build_depend>goto_crossing</build_depend>
@@ -50,8 +51,6 @@
   <build_depend>roscpp</build_depend>
   <build_depend>tf</build_depend>
   <build_depend>visualization_msgs</build_depend>
-  <run_depend>actionlib</run_depend>
-  <run_depend>actionlib_msgs</run_depend>
   <run_depend>crossing_detector</run_depend>
   <run_depend>geometry_msgs</run_depend>
   <run_depend>goto_crossing</run_depend>

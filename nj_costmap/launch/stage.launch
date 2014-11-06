@@ -32,6 +32,7 @@
 	<!--
     <node name="nj_costmap" pkg="nj_costmap" type="nj_costmap"
 		output="screen" launch-prefix="valgrind -DELETEME-tool=callgrind">
+        # two '-' end a comment in xml, so delete DELETEME to use
 	-->
     <node name="nj_costmap" pkg="nj_costmap" type="nj_costmap"
 		output="screen">

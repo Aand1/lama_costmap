@@ -6,8 +6,6 @@ project(nj_costmap)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED
 	COMPONENTS
-	actionlib
-	actionlib_msgs
 	crossing_detector
 	geometry_msgs
 	goto_crossing
@@ -89,7 +87,7 @@ find_package(catkin REQUIRED
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 	INCLUDE_DIRS include
-	CATKIN_DEPENDS actionlib actionlib_msgs geometry_msgs goto_crossing lama_jockeys lama_msgs nav_msgs roscpp tf
+	CATKIN_DEPENDS geometry_msgs goto_crossing lama_jockeys lama_msgs nav_msgs roscpp tf
 )
 
 ###########

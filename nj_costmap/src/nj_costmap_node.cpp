@@ -27,13 +27,13 @@ int main(int argc, char **argv)
   }
 
   ros::init(argc, argv, "default_name_nj_costmap");
-  ros::NodeHandle nh;
+  ros::NodeHandle nh; // Log in jockey works better with this line.
   ros::NodeHandle private_nh("~");
 
   /* Minimal frontier width */
   if (!private_nh.hasParam("frontier_width"))
   {
-    ROS_ERROR("Parameter frontier_width not set, exiting.");
+    ROS_ERROR("Parameter %s/frontier_width not set, exiting", private_nh.getNamespace().c_str());
     return 1;
   }
   double frontier_width;
