@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<package>
+  <name>nj_oa_costmap</name>
+  <version>0.0.0</version>
+  <description>The nj_oa_costmap package is a navigating jockey for the Large
+	  Maps framework. Its role is to drive the robot forward while avoiding
+	  obstacles. It uses a local map which position is relative to the robot
+	  but which orientation is constant.</description>
+
+  <!-- One maintainer tag required, multiple allowed, one person per tag --> 
+  <maintainer email="gael.ecorchard@ciirc.cvut.cz">Gaël Ecorchard</maintainer>
+
+
+  <!-- One license tag required, multiple allowed, one license per tag -->
+  <license>MIT</license>
+
+
+  <!-- Url tags are optional, but mutiple are allowed, one per tag -->
+  <!-- Optional attribute type can be: website, bugtracker, or repository -->
+  <!-- Example: -->
+  <!-- <url type="website">http://wiki.ros.org/nj_oa_laser</url> -->
+
+
+  <!-- Author tags are optional, mutiple are allowed, one per tag -->
+  <!-- Authors do not have to be maintianers, but could be -->
+  <author email="gael.ecorchard@ciirc.cvut.cz">Gaël Ecorchard</author>
+  <author email="kosnar@labe.felk.cvut.cz">Karel Košnar</author>
+
+
+  <!-- The *_depend tags are used to specify dependencies -->
+  <!-- Dependencies can be catkin packages or system dependencies -->
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>lama_jockeys</build_depend>
+  <build_depend>map_ray_caster</build_depend>
+  <build_depend>nav_msgs</build_depend>
+  <build_depend>nj_oa_laser</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>tf</build_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>lama_jockeys</run_depend>
+  <run_depend>map_ray_caster</run_depend>
+  <run_depend>nav_msgs</run_depend>
+  <run_depend>nj_oa_laser</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>tf</run_depend>
+
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <!-- You can specify that this package is a metapackage here: -->
+    <!-- <metapackage/> -->
+
+    <!-- Other tools can request additional information be placed here -->
+
+  </export>
+</package>
