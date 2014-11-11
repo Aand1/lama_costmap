@@ -5,11 +5,23 @@ namespace nj_costmap {
 
 Jockey::Jockey(const std::string& name, const double frontier_width) :
   NavigatingJockey(name),
+  odom_frame_("odom"),
   has_crossing_(false),
-  crossing_detector_(frontier_width)
+  crossing_detector_(frontier_width),
+  obstacle_avoider_(frontier_width / 2, "")
 {
-  if (!private_nh_.getParam("odom_frame", odom_frame_))
-    odom_frame_ = "odom";
+  private_nh_.getParam("odom_frame", odom_frame_);
+
+  std::string laser_frame = "base_laser_link";
+  private_nh_.getParam("laser_frame", laser_frame);
+  obstacle_avoider_.laser_frame = laser_frame;
+
+  double robot_radius;
+  if (private_nh_.getParam("robot_radius", robot_radius))
+  {
+    obstacle_avoider_.robot_radius = robot_radius;
+  }
+
 
   pub_twist_ = private_nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
 	pub_crossing_marker_ = private_nh_.advertise<visualization_msgs::Marker>("crossing_marker", 50, true);
@@ -26,7 +38,7 @@ void Jockey::onTraverse()
   ROS_DEBUG("Costmap handler started");
   
   ros::Rate r(100);
-  while (true)
+  while (ros::ok())
   {
     if (server_.isPreemptRequested() && !ros::ok())
     {
@@ -39,17 +51,27 @@ void Jockey::onTraverse()
     if (has_crossing_)
     {
       geometry_msgs::Twist twist;
-      bool goal_reached = crossing_goer_.goto_crossing(rel_crossing_, twist);
-      pub_twist_.publish(twist);
-      ROS_DEBUG("twist (%.3f, %.3f)", twist.linear.x, twist.angular.z);
-
-      if (goal_reached)
+      if (rel_crossing_.frontiers.size() < 3)
       {
-        result_.final_state = result_.DONE;
-        result_.completion_time = getCompletionDuration();
-        server_.setSucceeded(result_);
-        break;
+        twist = obstacle_avoider_.getTwist(map_);
+        pub_twist_.publish(twist);
+        ROS_DEBUG("Obstacle avoiding");
       }
+      else
+      {
+        bool goal_reached = crossing_goer_.goto_crossing(rel_crossing_, twist);
+        pub_twist_.publish(twist);
+        ROS_DEBUG("Go to crossing");
+
+        if (goal_reached)
+        {
+          result_.final_state = result_.DONE;
+          result_.completion_time = getCompletionDuration();
+          server_.setSucceeded(result_);
+          break;
+        }
+      }
+      ROS_DEBUG("twist (%.3f, %.3f)", twist.linear.x, twist.angular.z);
       has_crossing_ = false;
     }
     ros::spinOnce();
@@ -83,27 +105,26 @@ void Jockey::onContinue()
  */
 void Jockey::handleCostmap(const nav_msgs::OccupancyGridConstPtr& msg)
 {
-  abs_crossing_ = crossing_detector_.crossingDescriptor(*msg);
+  map_ = *msg;
+  abs_crossing_ = crossing_detector_.crossingDescriptor(map_);
  
   ROS_DEBUG("%s: crossing (%.3f, %.3f, %.3f), number of exits: %zu", ros::this_node::getName().c_str(),
         abs_crossing_.center.x, abs_crossing_.center.y, abs_crossing_.radius, abs_crossing_.frontiers.size());
 
   // Get the rotation between odom_frame_ and the map frame.
-  tf::TransformListener tfListener;
   tf::StampedTransform tr;
   try
   {
-    tfListener.waitForTransform(odom_frame_, msg->header.frame_id,
-        msg->header.stamp, ros::Duration(1.0));
-    tfListener.lookupTransform(odom_frame_, msg->header.frame_id, 
-        msg->header.stamp, tr);
+    tf_listener_.waitForTransform(odom_frame_, map_.header.frame_id,
+        map_.header.stamp, ros::Duration(0.2));
+    tf_listener_.lookupTransform(odom_frame_, map_.header.frame_id, 
+        map_.header.stamp, tr);
   }
-
   catch (tf::TransformException ex)
   {
-    ROS_ERROR("Error in nj_costmap");
-    ROS_ERROR("%s", ex.what());
+    ROS_ERROR("%s: %s", ros::this_node::getName().c_str(), ex.what());
   }
+  ROS_INFO("%s, %s", odom_frame_.c_str(), map_.header.frame_id.c_str());
   map_relative_orientation_ = tf::getYaw(tr.getRotation());
 
   // Transform the crossing with absolute angles to relative angles.
@@ -111,20 +132,24 @@ void Jockey::handleCostmap(const nav_msgs::OccupancyGridConstPtr& msg)
   rotateCrossing(map_relative_orientation_, rel_crossing_);
   has_crossing_ = true;
 
+  ROS_INFO("abs crossing: (%.3f, %.3f)", abs_crossing_.center.x, abs_crossing_.center.y); // DEBUG
+  ROS_INFO("rel crossing: (%.3f, %.3f)", rel_crossing_.center.x, rel_crossing_.center.y); // DEBUG
+  ROS_INFO("map_relative_orientation_: %.3f", map_relative_orientation_); // DEBUG
+
   for (size_t i = 0; i < rel_crossing_.frontiers.size(); ++i)
     ROS_DEBUG("Relative frontier angle = %.3f", rel_crossing_.frontiers[i].angle);
 
   // Visualization: a sphere at detected crossing center
   if (pub_crossing_marker_.getNumSubscribers())
   {
-    visualization_msgs::Marker m = getCrossingCenterMarker(msg->header.frame_id, abs_crossing_);
+    visualization_msgs::Marker m = getCrossingCenterMarker(map_.header.frame_id, abs_crossing_);
     pub_crossing_marker_.publish(m);
   }
 
   // Visualization: a line at each detected road
   if (pub_exits_marker_.getNumSubscribers())
   {
-    visualization_msgs::Marker m = getFrontiersMarker(msg->header.frame_id, abs_crossing_);
+    visualization_msgs::Marker m = getFrontiersMarker(map_.header.frame_id, abs_crossing_);
     pub_exits_marker_.publish(m);
   }
 

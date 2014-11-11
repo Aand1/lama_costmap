@@ -5,15 +5,16 @@ project(nj_costmap)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED
-	COMPONENTS
-	crossing_detector
-	geometry_msgs
-	goto_crossing
-	lama_jockeys
-	lama_msgs
-	nav_msgs
-	roscpp
-	tf
+  COMPONENTS
+  crossing_detector
+  geometry_msgs
+  goto_crossing
+  lama_jockeys
+  lama_msgs
+  nav_msgs
+  nj_oa_costmap
+  roscpp
+  tf
 )
 
 ## System dependencies are found with CMake's conventions
@@ -86,8 +87,8 @@ find_package(catkin REQUIRED
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-	INCLUDE_DIRS include
-	CATKIN_DEPENDS geometry_msgs goto_crossing lama_jockeys lama_msgs nav_msgs roscpp tf
+  INCLUDE_DIRS include
+  CATKIN_DEPENDS geometry_msgs goto_crossing lama_jockeys lama_msgs nav_msgs roscpp tf
 )
 
 ###########
