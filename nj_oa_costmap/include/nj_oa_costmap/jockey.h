@@ -48,19 +48,15 @@
 #ifndef NJ_OA_COSTMAP_JOCKEY_H
 #define NJ_OA_COSTMAP_JOCKEY_H
 
-#include <cmath>
 #include <string>
 
-#include <angles/angles.h>
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/OccupancyGrid.h>
-#include <sensor_msgs/LaserScan.h>
-#include <tf/transform_listener.h>
-
-#include <map_ray_caster/map_ray_caster.h>
-#include <nj_oa_laser/jockey.h>
 
 #include <lama_jockeys/navigating_jockey.h>
+#include <nj_oa_laser/jockey.h>
+
+#include <nj_oa_costmap/twist_handler.h>
 
 namespace lama {
 namespace nj_oa_costmap {
@@ -86,7 +82,7 @@ class Jockey : public nj_oa_laser::Jockey
                                      //!> encounter any occupied or unknown point on the map.
 
     // Internals.
-    map_ray_caster::MapRayCaster ray_caster_;
+    TwistHandler twist_handler_;
 };
 
 } // namespace nj_oa_costmap

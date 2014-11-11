@@ -15,21 +15,21 @@ int main(int argc, char **argv)
     ros::console::notifyLoggerLevelsChanged();
   }
 
-  /* Compulsory parameter: robot width */
-  if (!private_nh.hasParam("robot_width"))
+  /* Compulsory parameter: robot radius */
+  if (!private_nh.hasParam("robot_radius"))
   {
-    ROS_ERROR("Parameter %s/robot_width not set, exiting", private_nh.getNamespace().c_str());
+    ROS_ERROR("Parameter %s/robot_radius not set, exiting", private_nh.getNamespace().c_str());
     return 1;
   }
-  double robot_width;
-  private_nh.param<double>("robot_width", robot_width, 0.0);
+  double robot_radius;
+  private_nh.param<double>("robot_radius", robot_radius, 0.0);
 
   std::string navigating_jockey_name;
   std::string default_jockey_name = ros::this_node::getName();
   default_jockey_name += "_server";
 	private_nh.param<std::string>("navigating_jockey_server_name", navigating_jockey_name, default_jockey_name);
 
-  lama::nj_oa_costmap::Jockey jockey(navigating_jockey_name, robot_width);
+  lama::nj_oa_costmap::Jockey jockey(navigating_jockey_name, robot_radius);
 
   ROS_INFO("%s started (with server %s)", ros::this_node::getName().c_str(), jockey.getName().c_str());
   ros::spin();

@@ -84,10 +84,22 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES nj_oa_costmap
-#  CATKIN_DEPENDS geometry_msgs lama_jockeys map_ray_caster nav_msgs nj_oa_laser roscpp tf
-#  DEPENDS system_lib
+  INCLUDE_DIRS
+  include
+
+  LIBRARIES
+  nj_oa_costmap_twist_handler
+
+  CATKIN_DEPENDS
+  geometry_msgs
+  lama_jockeys
+  map_ray_caster
+  nav_msgs
+  nj_oa_laser
+  roscpp tf
+
+  DEPENDS
+  system_lib
 )
 
 ###########
@@ -103,19 +115,18 @@ include_directories(
 )
 
 ## Declare a cpp library
-# add_library(nj_oa_costmap
-#   src/${PROJECT_NAME}/nj_oa_costmap.cpp
-# )
+add_library(nj_oa_costmap_twist_handler src/twist_handler.cpp)
 
 ## Declare a cpp executable
-add_executable(nj_oa_costmap src/nj_oa_costmap_node.cpp src/jockey.cpp)
+set (SRCS ${SRCS} src/jockey.cpp)
+add_executable(nj_oa_costmap src/nj_oa_costmap_node.cpp ${SRCS})
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 # add_dependencies(nj_oa_costmap_node nj_oa_costmap_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(nj_oa_costmap ${catkin_LIBRARIES})
+target_link_libraries(nj_oa_costmap nj_oa_costmap_twist_handler ${catkin_LIBRARIES})
 
 #############
 ## Install ##
