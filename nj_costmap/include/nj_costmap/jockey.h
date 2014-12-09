@@ -83,7 +83,6 @@ class Jockey : public NavigatingJockey
 
     // Internals.
     std::string odom_frame_;
-    double map_relative_orientation_;  //!> angle from LaserScan (on which the map is base) to the map.
     bool has_crossing_;  //!> true when a new crossing was computed.
     nav_msgs::OccupancyGrid map_;  //!> Last received map.
     lama_msgs::Crossing abs_crossing_;  //!> Crossing descriptor with relative position and absolute angle.

@@ -22,9 +22,8 @@ Jockey::Jockey(const std::string& name, const double frontier_width) :
     obstacle_avoider_.robot_radius = robot_radius;
   }
 
-
   pub_twist_ = private_nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
-	pub_crossing_marker_ = private_nh_.advertise<visualization_msgs::Marker>("crossing_marker", 50, true);
+  pub_crossing_marker_ = private_nh_.advertise<visualization_msgs::Marker>("crossing_marker", 50, true);
   pub_exits_marker_ = private_nh_.advertise<visualization_msgs::Marker> ("exits_marker", 50, true);
   pub_place_profile_ = private_nh_.advertise<sensor_msgs::PointCloud>("place_profile", 50, true);
   pub_crossing_ = private_nh_.advertise<lama_msgs::Crossing>("abs_crossing", 50, true);
@@ -32,7 +31,7 @@ Jockey::Jockey(const std::string& name, const double frontier_width) :
 
 void Jockey::onTraverse()
 {
-  ROS_INFO("%s: Received action TRAVERSE or CONTINUE", ros::this_node::getName().c_str());
+  ROS_INFO("Received action TRAVERSE or CONTINUE");
   crossing_goer_.resetIntegrals();
   costmap_handler_ = private_nh_.subscribe("local_costmap", 1, &Jockey::handleCostmap, this);
   ROS_DEBUG("Costmap handler started");
@@ -82,7 +81,7 @@ void Jockey::onTraverse()
 
 void Jockey::onStop()
 {
-  ROS_DEBUG("%s: Received action STOP or INTERRUPT", ros::this_node::getName().c_str());
+  ROS_DEBUG("Received action STOP or INTERRUPT");
   costmap_handler_.shutdown();
   result_.final_state = result_.DONE;
   result_.completion_time = ros::Duration(0.0);
@@ -91,13 +90,13 @@ void Jockey::onStop()
 
 void Jockey::onInterrupt()
 {
-  ROS_DEBUG("%s: Received action INTERRUPT", ros::this_node::getName().c_str());
+  ROS_DEBUG("Received action INTERRUPT");
   onStop();
 }
 
 void Jockey::onContinue()
 {
-  ROS_DEBUG("%s: Received action CONTINUE", ros::this_node::getName().c_str());
+  ROS_DEBUG("Received action CONTINUE");
   onTraverse();
 }
 
@@ -108,8 +107,8 @@ void Jockey::handleCostmap(const nav_msgs::OccupancyGridConstPtr& msg)
   map_ = *msg;
   abs_crossing_ = crossing_detector_.crossingDescriptor(map_);
  
-  ROS_DEBUG("%s: crossing (%.3f, %.3f, %.3f), number of exits: %zu", ros::this_node::getName().c_str(),
-        abs_crossing_.center.x, abs_crossing_.center.y, abs_crossing_.radius, abs_crossing_.frontiers.size());
+  ROS_DEBUG("Crossing (%.3f, %.3f, %.3f), number of exits: %zu",
+      abs_crossing_.center.x, abs_crossing_.center.y, abs_crossing_.radius, abs_crossing_.frontiers.size());
 
   // Get the rotation between odom_frame_ and the map frame.
   tf::StampedTransform tr;
@@ -122,19 +121,17 @@ void Jockey::handleCostmap(const nav_msgs::OccupancyGridConstPtr& msg)
   }
   catch (tf::TransformException ex)
   {
-    ROS_ERROR("%s: %s", ros::this_node::getName().c_str(), ex.what());
+    ROS_ERROR("%s", ex.what());
   }
-  ROS_INFO("%s, %s", odom_frame_.c_str(), map_.header.frame_id.c_str());
-  map_relative_orientation_ = tf::getYaw(tr.getRotation());
+  // ROS_INFO("%s, %s", odom_frame_.c_str(), map_.header.frame_id.c_str());  // DEBUG
+
+  // Angle from LaserScan (on which the map is base) to the map.
+  const double map_relative_orientation = tf::getYaw(tr.getRotation());
 
   // Transform the crossing with absolute angles to relative angles.
   rel_crossing_ = abs_crossing_;
-  rotateCrossing(map_relative_orientation_, rel_crossing_);
+  rotateCrossing(rel_crossing_, map_relative_orientation);
   has_crossing_ = true;
-
-  ROS_INFO("abs crossing: (%.3f, %.3f)", abs_crossing_.center.x, abs_crossing_.center.y); // DEBUG
-  ROS_INFO("rel crossing: (%.3f, %.3f)", rel_crossing_.center.x, rel_crossing_.center.y); // DEBUG
-  ROS_INFO("map_relative_orientation_: %.3f", map_relative_orientation_); // DEBUG
 
   for (size_t i = 0; i < rel_crossing_.frontiers.size(); ++i)
     ROS_DEBUG("Relative frontier angle = %.3f", rel_crossing_.frontiers[i].angle);
