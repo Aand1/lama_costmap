@@ -1,7 +1,6 @@
-#ifndef _LMAP_LOC_TYPES_H_
-#define _LMAP_LOC_TYPES_H_
+#ifndef NJ_COSTMAP_LMAP_LOC_TYPES
+#define NJ_COSTMAP_LMAP_LOC_TYPES
 
-namespace lama {
 namespace nj_costmap {
 
 // Edge of a Voronoi diagram
@@ -29,6 +28,5 @@ struct CenterC
 };
 
 } // namespace nj_costmap
-} // namespace lama
 
-#endif // #ifndef _LMAP_LOC_TYPES_H_
+#endif // #ifndef NJ_COSTMAP_LMAP_LOC_TYPES
