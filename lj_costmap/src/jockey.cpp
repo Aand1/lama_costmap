@@ -176,15 +176,14 @@ void Jockey::onGetDissimilarity()
   // Get all scans from database.
   lama_interfaces::ActOnMap srv;
   srv.request.action = lama_interfaces::ActOnMapRequest::GET_VERTEX_LIST;
-  ROS_INFO("%s: calling action GET_VERTEX_LIST", ros::this_node::getName().c_str()); // DEBUG
+  ROS_INFO("Calling action GET_VERTEX_LIST"); // DEBUG
   if (!map_agent_.call(srv))
   {
-    ROS_ERROR("%s: failed to call map agent", ros::this_node::getName().c_str());
+    ROS_ERROR("Failed to call map agent");
     server_.setAborted();
     return;
   }
-  ROS_INFO("%s: received response GET_VERTEX_LIST", ros::this_node::getName().c_str()); // DEBUG
-  ROS_INFO("%s: received %zu vertices", ros::this_node::getName().c_str(), srv.response.objects.size()); // DEBUG
+  ROS_INFO("Received %zu vertices", srv.response.objects.size()); // DEBUG
   
   // Iterate over vertices and get the associated Polygon (from the PlaceProfile).
   std::vector<int32_t> vertices;
