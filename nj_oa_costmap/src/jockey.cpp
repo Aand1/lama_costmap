@@ -1,6 +1,5 @@
 #include <nj_oa_costmap/jockey.h>
 
-namespace lama {
 namespace nj_oa_costmap {
 
 const double Jockey::fake_laser_beam_count_ = 20; // Must be at least 2.
@@ -44,8 +43,5 @@ void Jockey::handleMap(const nav_msgs::OccupancyGridConstPtr& msg)
   pub_twist_.publish(twist);
 }
 
-
 } // namespace nj_oa_costmap
-} // namespace lama
-
 

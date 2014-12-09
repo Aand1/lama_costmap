@@ -1,6 +1,5 @@
 #include <lj_costmap/jockey.h>
 
-namespace lama {
 namespace lj_costmap {
 
 Jockey::Jockey(std::string name, const double frontier_width, const double max_frontier_angle) :
@@ -91,7 +90,7 @@ void Jockey::getData()
 void Jockey::handleMap(const nav_msgs::OccupancyGridConstPtr& msg)
 {
   map_ = *msg;
-  profile_ = costmapToPlaceProfile(map_);
+  profile_ = lama_common::costmapToPlaceProfile(map_);
   data_received_ = true;
 }
 
@@ -270,4 +269,3 @@ lama_interfaces::DescriptorLink Jockey::crossingDescriptorLink(const int32_t id)
 }
 
 } // namespace lj_costmap
-} // namespace lama

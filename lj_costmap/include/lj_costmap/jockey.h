@@ -41,22 +41,21 @@
 
 #include <ros/ros.h>
 
+#include <lama_common/place_profile_conversions.h>
 #include <lama_interfaces/ActOnMap.h>
 #include <lama_interfaces/DescriptorLink.h>
 #include <lama_interfaces/AddInterface.h>
+#include <lama_jockeys/localizing_jockey.h>
 #include <lama_msgs/GetPlaceProfile.h>
 #include <lama_msgs/SetPlaceProfile.h>
 #include <lama_msgs/SetCrossing.h>
-#include <lama_msgs/place_profile_conversions.h>
-#include <lama_jockeys/localizing_jockey.h>
 #include <polygon_matcher/PolygonDissimilarity.h>
 
 #include <crossing_detector/costmap_crossing_detector.h>
 
-namespace lama {
 namespace lj_costmap {
 
-class Jockey : public LocalizingJockey
+class Jockey : public lama_jockeys::LocalizingJockey
 {
   public:
 
@@ -105,6 +104,5 @@ class Jockey : public LocalizingJockey
 
 
 } // namespace lj_costmap
-} // namespace lama
 
 #endif // LJ_COSTMAP_JOCKEY_H

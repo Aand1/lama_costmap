@@ -29,9 +29,9 @@ int main(int argc, char **argv)
   default_jockey_name += "_server";
 	private_nh.param<std::string>("navigating_jockey_server_name", navigating_jockey_name, default_jockey_name);
 
-  lama::nj_oa_costmap::Jockey jockey(navigating_jockey_name, robot_radius);
+  nj_oa_costmap::Jockey jockey(navigating_jockey_name, robot_radius);
 
-  ROS_INFO("%s started (with server %s)", ros::this_node::getName().c_str(), jockey.getName().c_str());
+  ROS_INFO_STREAM(ros::this_node::getName() << " started (with server " << jockey.getName() << ")");
   ros::spin();
   return 0;
 }

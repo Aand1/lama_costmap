@@ -1,6 +1,5 @@
 #include <nj_oa_costmap/twist_handler.h>
 
-namespace lama {
 namespace nj_oa_costmap {
 
 TwistHandler::TwistHandler(const double robot_radius, const std::string& laser_frame) :
@@ -46,4 +45,3 @@ geometry_msgs::Twist TwistHandler::getTwist(const nav_msgs::OccupancyGrid& map)
 }
 
 } // namespace nj_costmap
-} // namespace lama

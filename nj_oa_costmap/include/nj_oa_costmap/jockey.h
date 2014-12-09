@@ -58,7 +58,6 @@
 
 #include <nj_oa_costmap/twist_handler.h>
 
-namespace lama {
 namespace nj_oa_costmap {
 
 class Jockey : public nj_oa_laser::Jockey
@@ -86,6 +85,5 @@ class Jockey : public nj_oa_laser::Jockey
 };
 
 } // namespace nj_oa_costmap
-} // namespace lama
 
 #endif // NJ_OA_COSTMAP_JOCKEY_H

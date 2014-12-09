@@ -3,7 +3,7 @@
 namespace nj_costmap {
 
 Jockey::Jockey(const std::string& name, const double frontier_width) :
-  NavigatingJockey(name),
+  lama_jockeys::NavigatingJockey(name),
   odom_frame_("odom"),
   has_crossing_(false),
   crossing_detector_(frontier_width),
@@ -138,21 +138,21 @@ void Jockey::handleCostmap(const nav_msgs::OccupancyGridConstPtr& msg)
   // Visualization: a sphere at detected crossing center
   if (pub_crossing_marker_.getNumSubscribers())
   {
-    visualization_msgs::Marker m = getCrossingCenterMarker(map_.header.frame_id, abs_crossing_);
+    visualization_msgs::Marker m = lama_common::getCrossingCenterMarker(map_.header.frame_id, abs_crossing_);
     pub_crossing_marker_.publish(m);
   }
 
   // Visualization: a line at each detected road
   if (pub_exits_marker_.getNumSubscribers())
   {
-    visualization_msgs::Marker m = getFrontiersMarker(map_.header.frame_id, abs_crossing_);
+    visualization_msgs::Marker m = lama_common::getFrontiersMarker(map_.header.frame_id, abs_crossing_);
     pub_exits_marker_.publish(m);
   }
 
   // PlaceProfile visualization message.
   if (pub_place_profile_.getNumSubscribers())
   {
-    sensor_msgs::PointCloud cloud = placeProfileToPointCloud(crossing_detector_.getPlaceProfile());
+    sensor_msgs::PointCloud cloud = lama_common::placeProfileToPointCloud(crossing_detector_.getPlaceProfile());
     pub_place_profile_.publish(cloud);
   }
 

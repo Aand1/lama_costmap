@@ -48,15 +48,15 @@
 #include <goto_crossing/crossing_goer.h>
 #include <crossing_detector/costmap_crossing_detector.h>
 #include <lama_common/crossing_utils.h> /* lama_common::rotateCrossing() */
+#include <lama_common/crossing_visualization.h>
+#include <lama_common/place_profile_conversions.h>
 #include <lama_jockeys/navigating_jockey.h>
 #include <lama_msgs/Crossing.h>
-#include <lama_msgs/crossing_visualization.h>
-#include <lama_msgs/place_profile_conversions.h>
 #include <nj_oa_costmap/twist_handler.h>
 
 namespace nj_costmap {
 
-class Jockey : public NavigatingJockey
+class Jockey : public lama_jockeys::NavigatingJockey
 {
   public:
 
