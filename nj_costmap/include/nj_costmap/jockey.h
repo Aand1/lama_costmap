@@ -36,8 +36,8 @@
  *     map is based on.
  */
 
-#ifndef _NJ_COSTMAP_JOCKEY_H_
-#define _NJ_COSTMAP_JOCKEY_H_
+#ifndef NJ_COSTMAP_JOCKEY_H
+#define NJ_COSTMAP_JOCKEY_H
 
 #include <tf/tf.h>
 #include <tf/transform_listener.h>
@@ -47,14 +47,13 @@
 
 #include <goto_crossing/crossing_goer.h>
 #include <crossing_detector/costmap_crossing_detector.h>
+#include <lama_common/crossing_utils.h> /* lama_common::rotateCrossing() */
 #include <lama_jockeys/navigating_jockey.h>
 #include <lama_msgs/Crossing.h>
-#include <lama_msgs/crossing_utils.h>
 #include <lama_msgs/crossing_visualization.h>
 #include <lama_msgs/place_profile_conversions.h>
 #include <nj_oa_costmap/twist_handler.h>
 
-namespace lama {
 namespace nj_costmap {
 
 class Jockey : public NavigatingJockey
@@ -95,8 +94,7 @@ class Jockey : public NavigatingJockey
 };
 
 } // namespace nj_costmap
-} // namespace lama
 
-#endif // _NJ_COSTMAP_JOCKEY_H_
+#endif // NJ_COSTMAP_JOCKEY_H
 
 

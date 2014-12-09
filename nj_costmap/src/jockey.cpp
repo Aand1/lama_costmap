@@ -1,6 +1,5 @@
 #include <nj_costmap/jockey.h>
 
-namespace lama {
 namespace nj_costmap {
 
 Jockey::Jockey(const std::string& name, const double frontier_width) :
@@ -130,7 +129,7 @@ void Jockey::handleCostmap(const nav_msgs::OccupancyGridConstPtr& msg)
 
   // Transform the crossing with absolute angles to relative angles.
   rel_crossing_ = abs_crossing_;
-  rotateCrossing(rel_crossing_, map_relative_orientation);
+  lama_common::rotateCrossing(rel_crossing_, map_relative_orientation);
   has_crossing_ = true;
 
   for (size_t i = 0; i < rel_crossing_.frontiers.size(); ++i)
@@ -161,5 +160,4 @@ void Jockey::handleCostmap(const nav_msgs::OccupancyGridConstPtr& msg)
 }
 
 } // namespace nj_costmap
-} // namespace lama
 
