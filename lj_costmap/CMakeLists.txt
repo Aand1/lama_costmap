@@ -4,14 +4,15 @@ project(lj_costmap)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS
-	crossing_detector
-	geometry_msgs
-	lama_interfaces
-	lama_jockeys
-	lama_msgs
-	nav_msgs
-	roscpp
+find_package(catkin REQUIRED
+  COMPONENTS
+  crossing_detector
+  geometry_msgs
+  lama_interfaces
+  lama_jockeys
+  lama_msgs
+  nav_msgs
+  roscpp
 )
 
 ## System dependencies are found with CMake's conventions
@@ -83,10 +84,10 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-	INCLUDE_DIRS include
-	# LIBRARIES lj_costmap_jockey
-	CATKIN_DEPENDS crossing_detector geometry_msgs lama_interfaces lama_jockeys lama_msgs nav_msgs roscpp
-	#  DEPENDS system_lib
+  INCLUDE_DIRS include
+  # LIBRARIES lj_costmap_jockey
+  CATKIN_DEPENDS crossing_detector geometry_msgs lama_interfaces lama_jockeys lama_msgs nav_msgs roscpp
+  #  DEPENDS system_lib
 )
 
 ###########
@@ -97,9 +98,9 @@ catkin_package(
 ## Your package locations should be listed before other locations
 # include_directories(include)
 include_directories(
-	include
-	${catkin_INCLUDE_DIRS}
-)
+  include
+  ${catkin_INCLUDE_DIRS}
+  )
 
 ## Declare a cpp library
 # add_library(lj_costmap_jockey src/jockey.cpp)
