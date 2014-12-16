@@ -103,8 +103,6 @@ void Jockey::handleMap(const nav_msgs::OccupancyGridConstPtr& msg)
 // is not a learning jockey.
 void Jockey::onGetVertexDescriptor()
 {
-  ROS_INFO("%s: Received action GET_VERTEX_DESCRIPTOR", ros::this_node::getName().c_str()); // DEBUG
-
   if (server_.isPreemptRequested() && !ros::ok())
   {
     ROS_INFO("%s: Preempted", jockey_name_.c_str());
@@ -168,8 +166,6 @@ void Jockey::onLocalizeEdge()
 
 void Jockey::onGetDissimilarity()
 {
-  ROS_INFO("%s: Received action GET_DISSIMILARITY", ros::this_node::getName().c_str());
-
   getData();
 
   // Get all scans from database.
@@ -203,16 +199,17 @@ void Jockey::onGetDissimilarity()
     }
     if (desc_srv.response.descriptor_links.size() > 1)
     {
-      ROS_WARN("%s: more than one descriptor with interface %s for vertex %d, taking the first one",
-          ros::this_node::getName().c_str(), place_profile_interface_name_.c_str(), desc_srv.request.object.id);
+      ROS_WARN_STREAM("More than one descriptor with interface " <<
+          place_profile_interface_name_ << " for vertex " <<
+          desc_srv.request.object.id << ", taking the first one");
     }
     // Get the first linked PlaceProfile.
     lama_msgs::GetPlaceProfile profile_srv;
     profile_srv.request.id = desc_srv.response.descriptor_links[0].descriptor_id;
     if (!place_profile_getter_.call(profile_srv))
     {
-      ROS_ERROR("%s: failed to call %s service", ros::this_node::getName().c_str(),
-          place_profile_interface_name_.c_str());
+      ROS_ERROR_STREAM(jockey_name_ << ": failed to call service \"" <<
+          place_profile_interface_name_ << "\"");
       server_.setAborted();
       return;
     }
@@ -232,8 +229,8 @@ void Jockey::onGetDissimilarity()
     dissimi_srv.request.polygon2 = polygons[i];
     if (!dissimilarity_server_.call(dissimi_srv))
     {
-      ROS_ERROR("%s: failed to call %s", ros::this_node::getName().c_str(),
-          dissimilarity_server_name_.c_str());
+      ROS_ERROR_STREAM(jockey_name_ << ": failed to call service \"" << 
+          dissimilarity_server_name_ << "\"");
       server_.setAborted();
       return;
     }
