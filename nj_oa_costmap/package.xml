@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>nj_oa_costmap</name>
-  <version>0.0.0</version>
+  <version>0.1.0</version>
   <description>The nj_oa_costmap package is a navigating jockey for the Large
 	  Maps framework. Its role is to drive the robot forward while avoiding
 	  obstacles. It uses a local map which position is relative to the robot
@@ -12,7 +12,7 @@
 
 
   <!-- One license tag required, multiple allowed, one license per tag -->
-  <license>MIT</license>
+  <license>BSD</license>
 
 
   <!-- Url tags are optional, but mutiple are allowed, one per tag -->
