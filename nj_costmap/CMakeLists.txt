@@ -160,7 +160,7 @@ target_link_libraries(nj_costmap ${catkin_LIBRARIES})
 #############
 
 ## Add gtest based cpp test target and link libraries
-catkin_add_gtest(${PROJECT_NAME}-test test/utest.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/utest.cpp)
 # if(TARGET utest)
 #   target_link_libraries(utest ${PROJECT_NAME})
 # endif()
