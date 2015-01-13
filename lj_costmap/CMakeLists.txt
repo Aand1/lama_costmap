@@ -12,6 +12,7 @@ find_package(catkin REQUIRED
   lama_jockeys
   lama_msgs
   nav_msgs
+  polygon_matcher
   roscpp
 )
 
@@ -94,6 +95,7 @@ catkin_package(
   lama_jockeys
   lama_msgs
   nav_msgs
+  polygon_matcher
   roscpp
 
   #  DEPENDS system_lib
