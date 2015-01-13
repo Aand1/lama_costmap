@@ -86,7 +86,16 @@ find_package(catkin REQUIRED
 catkin_package(
   INCLUDE_DIRS include
   # LIBRARIES lj_costmap_jockey
-  CATKIN_DEPENDS crossing_detector geometry_msgs lama_interfaces lama_jockeys lama_msgs nav_msgs roscpp
+
+  CATKIN_DEPENDS
+  crossing_detector
+  geometry_msgs
+  lama_interfaces
+  lama_jockeys
+  lama_msgs
+  nav_msgs
+  roscpp
+
   #  DEPENDS system_lib
 )
 
@@ -130,11 +139,9 @@ target_link_libraries(lj_costmap ${catkin_LIBRARIES})
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS lj_costmap lj_costmap_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(TARGETS lj_costmap
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/

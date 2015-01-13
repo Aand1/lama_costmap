@@ -28,7 +28,7 @@ class TwistHandler : public nj_oa_laser::TwistHandler
 
   private:
 
-    map_ray_caster::MapRayCaster ray_caster_;
+    map_ray_caster::MapRayCaster ray_caster_; //!> Ray casting with cache to compute a fake LaserScan.
     tf::TransformListener tf_listerner_;
 };
 

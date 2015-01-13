@@ -87,8 +87,19 @@ find_package(catkin REQUIRED
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  INCLUDE_DIRS include
-  CATKIN_DEPENDS geometry_msgs goto_crossing lama_jockeys lama_msgs nav_msgs roscpp tf
+  INCLUDE_DIRS
+  include
+
+  CATKIN_DEPENDS
+  crossing_detector
+  geometry_msgs
+  goto_crossing
+  lama_jockeys
+  lama_msgs
+  nav_msgs
+  nj_oa_costmap
+  roscpp
+  tf
 )
 
 ###########
@@ -135,11 +146,9 @@ target_link_libraries(nj_costmap ${catkin_LIBRARIES})
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS nj_costmap nj_costmap_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(TARGETS nj_costmap
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/
