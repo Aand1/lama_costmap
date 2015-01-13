@@ -31,9 +31,9 @@
  *
  * Parameters:
  * - name, type, default name, description
- * - costmap_interface_name, String, jockey_name + "_place_profile"
- * - crossing_interface_name, String, jockey_name + "_crossing"
- * - dissimilarity_server_name, String, "dissimilarity_server"
+ * - costmap_interface_name, String, jockey_name + "_place_profile", name of the map interface for place profiles.
+ * - crossing_interface_name, String, jockey_name + "_crossing", name of the map interface for crossing.
+ * - dissimilarity_server_name, String, "dissimilarity_server", name of the dissimilarity server.
  */
 
 #ifndef LJ_COSTMAP_JOCKEY_H
@@ -43,8 +43,8 @@
 
 #include <lama_common/place_profile_conversions.h>
 #include <lama_interfaces/ActOnMap.h>
-#include <lama_interfaces/DescriptorLink.h>
 #include <lama_interfaces/AddInterface.h>
+#include <lama_msgs/DescriptorLink.h>
 #include <lama_jockeys/localizing_jockey.h>
 #include <lama_msgs/GetPlaceProfile.h>
 #include <lama_msgs/SetPlaceProfile.h>
@@ -78,8 +78,8 @@ class Jockey : public lama_jockeys::LocalizingJockey
     void getData();
     void handleMap(const nav_msgs::OccupancyGridConstPtr& msg);
 
-    lama_interfaces::DescriptorLink placeProfileDescriptorLink(const int32_t id);
-    lama_interfaces::DescriptorLink crossingDescriptorLink(const int32_t id);
+    lama_msgs::DescriptorLink placeProfileDescriptorLink(const int32_t id);
+    lama_msgs::DescriptorLink crossingDescriptorLink(const int32_t id);
 
     bool data_received_;
 

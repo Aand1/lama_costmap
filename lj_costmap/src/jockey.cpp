@@ -247,9 +247,9 @@ void Jockey::onGetDissimilarity()
 
 /* Return a DescriptorLink for the PlaceProfile interface
  */
-lama_interfaces::DescriptorLink Jockey::placeProfileDescriptorLink(const int32_t id)
+lama_msgs::DescriptorLink Jockey::placeProfileDescriptorLink(const int32_t id)
 {
-  lama_interfaces::DescriptorLink descriptor_link;
+  lama_msgs::DescriptorLink descriptor_link;
   descriptor_link.descriptor_id = id;
   descriptor_link.interface_name = place_profile_interface_name_;
   return descriptor_link;
@@ -257,9 +257,9 @@ lama_interfaces::DescriptorLink Jockey::placeProfileDescriptorLink(const int32_t
 
 /* Return a DescriptorLink for the Crossing interface
  */
-lama_interfaces::DescriptorLink Jockey::crossingDescriptorLink(const int32_t id)
+lama_msgs::DescriptorLink Jockey::crossingDescriptorLink(const int32_t id)
 {
-  lama_interfaces::DescriptorLink descriptor_link;
+  lama_msgs::DescriptorLink descriptor_link;
   descriptor_link.descriptor_id = id;
   descriptor_link.interface_name = crossing_interface_name_;
   return descriptor_link;
