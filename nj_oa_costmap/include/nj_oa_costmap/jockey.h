@@ -28,11 +28,11 @@
  * - none.
  *
  * Parameters:
- * - ~robot_width, Float, NO_DEFAULT, robot width.
- * - ~min_distance, Float, 2 * robot_width, if an obstacle is closer than this,
- *     turn and don't go forward (m/s).
- * - ~long_distance, Float, 5 * robot_width, if no obstacle within this
- *     distance, go straight (m/s).
+ * - ~robot_radius, Float, NO_DEFAULT, robot radius (m).
+ * - ~min_distance, Float, 2 * robot_radius, if an obstacle is closer than this,
+ *     turn and don't go forward (m).
+ * - ~long_distance, Float, 5 * robot_radius, if no obstacle within this
+ *     distance, go straight (m).
  * - ~turnrate_collide, Float, 0.4, turn rate when obstacle closer than
  *     min_distance_ (rad/s).
  * - ~max_vel, Float, 1.0, linear velocity without obstacle (m/s).
@@ -64,7 +64,7 @@ class Jockey : public nj_oa_laser::Jockey
 {
   public :
 
-    Jockey(const std::string& name, const double robot_width);
+    Jockey(const std::string& name, const double robot_radius);
 
     virtual void onTraverse();
 

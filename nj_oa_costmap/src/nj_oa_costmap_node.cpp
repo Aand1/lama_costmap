@@ -25,9 +25,8 @@ int main(int argc, char **argv)
   private_nh.param<double>("robot_radius", robot_radius, 0.0);
 
   std::string navigating_jockey_name;
-  std::string default_jockey_name = ros::this_node::getName();
-  default_jockey_name += "_server";
-	private_nh.param<std::string>("navigating_jockey_server_name", navigating_jockey_name, default_jockey_name);
+  private_nh.param<std::string>("navigating_jockey_server_name",
+      navigating_jockey_name, ros::this_node::getName() + "_server");
 
   nj_oa_costmap::Jockey jockey(navigating_jockey_name, robot_radius);
 

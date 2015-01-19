@@ -18,7 +18,10 @@ find_package(catkin REQUIRED
 )
 
 ## System dependencies are found with CMake's conventions
-#find_package(ANN REQUIRED)
+# Although CGAL is not directly needed here, linking fails without
+# the following two lines.
+find_package(CGAL REQUIRED COMPONENTS Core)
+include(${CGAL_USE_FILE})
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures

@@ -41,7 +41,7 @@ int main(int argc, char **argv)
 
   /* Navigating jockey name */
   std::string navigating_jockey_name;
-	private_nh.param<std::string>("navigating_jockey_server_name", navigating_jockey_name,
+  private_nh.param<std::string>("navigating_jockey_server_name", navigating_jockey_name,
       ros::this_node::getName() + "_server");
 
   nj_costmap::Jockey jockey(navigating_jockey_name, frontier_width);
