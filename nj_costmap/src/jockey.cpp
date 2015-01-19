@@ -23,8 +23,8 @@ Jockey::Jockey(const std::string& name, const double frontier_width) :
 
   pub_twist_ = private_nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
   pub_crossing_marker_ = private_nh_.advertise<visualization_msgs::Marker>("crossing_marker", 50, true);
-  pub_exits_marker_ = private_nh_.advertise<visualization_msgs::Marker> ("exits_marker", 50, true);
-  pub_place_profile_ = private_nh_.advertise<sensor_msgs::PointCloud>("place_profile", 50, true);
+  pub_exits_marker_ = private_nh_.advertise<visualization_msgs::Marker>("exits_marker", 50, true);
+  pub_place_profile_ = private_nh_.advertise<sensor_msgs::PointCloud>("place_profile_cloud", 50, true);
   pub_crossing_ = private_nh_.advertise<lama_msgs::Crossing>("abs_crossing", 50, true);
 }
 

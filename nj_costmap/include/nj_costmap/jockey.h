@@ -7,6 +7,12 @@
  * The action is done when the robot reaches the crossing center.
  * It is considered to be memory-less because it uses only an internal memory
  * (in form of a local map) and do not interact with the large map.
+ * Implemented actions:
+ * - TRAVERSE: will start navigating to the next crossing (place with at least
+ *   three frontiers) and will succeed when the crossing center is reached.
+ * - STOP: will stop
+ * - INTERRUPT: same as CONTINUE
+ * - CONTINUE: same as TRAVERSE
  *
  * Interaction with the map (created by this jockey):
  * - none
@@ -21,17 +27,17 @@
  * - geometry_msgs/Twist, "~/cmd_vel", robot set velocity
  * - visualization_msgs/Marker, "~/crossing_marker", a sphere at the crossing center.
  * - visualization_msgs/Marker, "~/exits_marker", lines from crossing center towards exits.
- * - sensor_msgs/PointCloud, "~/place_profile", point clound representing the place profile.
+ * - sensor_msgs/PointCloud, "~/place_profile_cloud", point cloud representing the place profile.
  * - lama_msgs/Crossing, "~/abs_crossing", Crossing with absolute frontier angles.
  *
  * Services used (other than map-related):
  * - none
  *
  * Parameters (read from this jockey):
- * - odom_frame, String, "/odom", this is the LaserScan frame from which the
+ * - odom_frame, String, "/odom", this is the laser scan frame from which the
  *     map relative orientation is computed.
  * - ~robot_radius, Float, frontier_width/2, robot radius (frontier_width is
- *     a constructor parameter)
+ *     a constructor parameter).
  * - ~laser_frame, String, "/base_laser_link", name of the LaserScan frame the
  *     map is based on.
  */
