@@ -19,8 +19,18 @@ find_package(catkin REQUIRED
 
 ## System dependencies are found with CMake's conventions
 # Although CGAL is not directly needed here, linking fails without
-# the following two lines.
+# the following lines.
 find_package(CGAL REQUIRED COMPONENTS Core)
+# Manually set CGAL_3RD_PARTY_LIBRARIES on Saucy
+include(cmake/FindUbuntuFlavor.cmake)
+if (${UBUNTU_DIST} AND ${UBUNTU_DIST} EQUAL "13.10")
+  if (EXISTS "/usr/lib/x86_64-linux-gnu/libboost_thread.so")
+    set(CGAL_3RD_PARTY_LIBRARIES "/usr/lib/x86_64-linux-gnu/libboost_thread.so;/usr/lib/x86_64-linux-gnu/libboost_system.so;/usr/lib/x86_64-linux-gnu/libpthread.so" )
+  else()
+    set(CGAL_3RD_PARTY_LIBRARIES "/usr/lib/i386-linux-gnu/libboost_thread.so;/usr/lib/i386-linux-gnu/libboost_system.so;/usr/lib/i386-linux-gnu/libpthread.so" )
+  endif()
+endif()
+# include after setting CGAL_3RD_PARTY_LIBRARIES.
 include(${CGAL_USE_FILE})
 
 
