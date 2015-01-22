@@ -7,7 +7,7 @@ Jockey::Jockey(std::string name, const double frontier_width, const double max_f
   data_received_(false),
   place_profile_interface_name_(name + "_place_profile"),
   crossing_interface_name_(name + "_crossing"),
-  dissimilarity_server_name_("dissimilarity_server"),
+  dissimilarity_server_name_("compute_dissimilarity"),
   crossing_detector_(frontier_width, max_frontier_angle)
 {
   private_nh_.getParam("place_profile_interface_name", place_profile_interface_name_);

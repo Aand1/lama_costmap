@@ -26,14 +26,14 @@
  *
  * Services used (other than map-related):
  * - service type, server default name, description
- * - polygon_matcher::PolygonDissimilarity, "~/dissimilarity_server", used to
+ * - polygon_matcher::PolygonDissimilarity, "~/compute_dissimilarity", used to
  *    compare all known places (as polygons) with the current place
  *
  * Parameters:
  * - name, type, default name, description
  * - costmap_interface_name, String, jockey_name + "_place_profile", name of the map interface for place profiles.
  * - crossing_interface_name, String, jockey_name + "_crossing", name of the map interface for crossing.
- * - dissimilarity_server_name, String, "dissimilarity_server", name of the dissimilarity server.
+ * - dissimilarity_server_name, String, "compute_dissimilarity", name of the dissimilarity server.
  */
 
 #ifndef LJ_COSTMAP_JOCKEY_H
