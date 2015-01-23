@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>nj_costmap</name>
-  <version>0.1.1</version>
+  <version>0.1.2</version>
   <description>The nj_costmap package implements a navigation jockey for the
 	  Large Maps framework (LaMa) based on a local costmap (costmap position is
 	  relative to the sensor but orientation is absolute).
