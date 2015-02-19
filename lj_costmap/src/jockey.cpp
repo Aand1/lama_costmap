@@ -68,11 +68,15 @@ void Jockey::initMapCrossingInterface()
  */
 void Jockey::getData()
 {
-  costmap_handler_ = nh_.subscribe<nav_msgs::OccupancyGrid>("local_costmap", 1, &Jockey::handleMap, this);
+  costmap_handler_ = private_nh_.subscribe<nav_msgs::OccupancyGrid>("local_costmap", 1, &Jockey::handleMap, this);
 
+  /* Wait a bit to avoid the first throttled message. */
+  ros::Duration(0.3).sleep();
+  ros::spinOnce();
   ros::Rate r(100);
   while (ros::ok())
   {
+    ros::spinOnce();
     if (data_received_)
     {
       // Stop the subscribers (may be superfluous).
@@ -80,7 +84,7 @@ void Jockey::getData()
       data_received_ = false;
       break;
     }
-    ros::spinOnce();
+    ROS_INFO_STREAM_THROTTLE(5, "Did not received any map on " << costmap_handler_.getTopic());
     r.sleep();
   }
 }
@@ -122,7 +126,7 @@ void Jockey::onGetVertexDescriptor()
     server_.setAborted();
     return;
   }
-  ROS_INFO("Added PlaceProfile with id %d", profile_setter_srv.response.id); // DEBUG
+  ROS_DEBUG("Added PlaceProfile with id %d to the map", profile_setter_srv.response.id);
   result_.descriptor_links.push_back(placeProfileDescriptorLink(profile_setter_srv.response.id));
 
   // Add the Crossing to the descriptor list.
@@ -131,11 +135,11 @@ void Jockey::onGetVertexDescriptor()
   crossing_setter_srv.request.descriptor = crossing;
   if (!crossing_setter_.call(crossing_setter_srv))
   {
-    ROS_ERROR("Failed to add Crossing to the map");
+    ROS_DEBUG("Failed to add Crossing to the map");
     server_.setAborted();
     return;
   }
-  ROS_INFO("Added Crossing with id %d", crossing_setter_srv.response.id); // DEBUG
+  ROS_DEBUG("Added Crossing with id %d to the map", crossing_setter_srv.response.id);
   result_.descriptor_links.push_back(crossingDescriptorLink(crossing_setter_srv.response.id));
   
   result_.state = lama_jockeys::LocalizeResult::DONE;
@@ -171,14 +175,12 @@ void Jockey::onGetDissimilarity()
   // Get all scans from database.
   lama_interfaces::ActOnMap srv;
   srv.request.action = lama_interfaces::ActOnMapRequest::GET_VERTEX_LIST;
-  ROS_INFO("Calling action GET_VERTEX_LIST"); // DEBUG
   if (!map_agent_.call(srv))
   {
     ROS_ERROR("Failed to call map agent");
     server_.setAborted();
     return;
   }
-  ROS_INFO("Received %zu vertices", srv.response.objects.size()); // DEBUG
   
   // Iterate over vertices and get the associated Polygon (from the PlaceProfile).
   std::vector<int32_t> vertices;
