@@ -49,14 +49,24 @@ void Jockey::onTraverse()
     if (has_crossing_)
     {
       geometry_msgs::Twist twist;
-      if (rel_crossing_.frontiers.size() < 3)
+      // Use crossing_goer_ if true else obstacle_avoider_
+      bool goto_crossing = true;
+      if (rel_crossing_.frontiers.empty())
       {
-        twist = obstacle_avoider_.getTwist(map_);
-        pub_twist_.publish(twist);
-        ROS_DEBUG("Obstacle avoiding");
+        goto_crossing = false;
       }
-      else
+      if (rel_crossing_.frontiers.size() == 1)
       {
+        if ((rel_crossing_.frontiers[0].angle > M_PI_2) ||
+              (rel_crossing_.frontiers[0].angle < -M_PI_2))
+        {
+          goto_crossing = false;
+        }
+      }
+      if (goto_crossing)
+      {
+        // Go to the crossing center if the number of exits is at least 2
+        // or if the sole exit is in front of the robot.
         bool goal_reached = crossing_goer_.goto_crossing(rel_crossing_, twist);
         pub_twist_.publish(twist);
         ROS_DEBUG("Go to crossing");
@@ -68,6 +78,13 @@ void Jockey::onTraverse()
           server_.setSucceeded(result_);
           break;
         }
+      }
+      else
+      {
+        // Go forward while avoiding obstacles.
+        twist = obstacle_avoider_.getTwist(map_);
+        pub_twist_.publish(twist);
+        ROS_DEBUG("Avoid obstacles");
       }
       ROS_DEBUG("twist (%.3f, %.3f)", twist.linear.x, twist.angular.z);
       has_crossing_ = false;
