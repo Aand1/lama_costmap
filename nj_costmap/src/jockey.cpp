@@ -1,6 +1,7 @@
 #include <nj_costmap/jockey.h>
 
-namespace nj_costmap {
+namespace nj_costmap
+{
 
 Jockey::Jockey(const std::string& name, const double frontier_width) :
   lama_jockeys::NavigatingJockey(name),
@@ -116,7 +117,7 @@ void Jockey::onContinue()
   onTraverse();
 }
 
-/* Callback for OccupancyGrid messages.
+/** Callback for OccupancyGrid messages.
  */
 void Jockey::handleCostmap(const nav_msgs::OccupancyGridConstPtr& msg)
 {

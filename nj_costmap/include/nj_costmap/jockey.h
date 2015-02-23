@@ -60,7 +60,8 @@
 #include <lama_msgs/Crossing.h>
 #include <nj_oa_costmap/twist_handler.h>
 
-namespace nj_costmap {
+namespace nj_costmap
+{
 
 class Jockey : public lama_jockeys::NavigatingJockey
 {
@@ -88,15 +89,15 @@ class Jockey : public lama_jockeys::NavigatingJockey
 
     // Internals.
     std::string odom_frame_;
-    bool has_crossing_;  //!> true when a new crossing was computed.
-    nav_msgs::OccupancyGrid map_;  //!> Last received map.
-    lama_msgs::Crossing abs_crossing_;  //!> Crossing descriptor with relative position and absolute angle.
-    lama_msgs::Crossing rel_crossing_;  //!> Crossing descriptor with relative position and relative angle.
+    bool has_crossing_;  //!< true when a new crossing was computed.
+    nav_msgs::OccupancyGrid map_;  //!< Last received map.
+    lama_msgs::Crossing abs_crossing_;  //!< Crossing descriptor with relative position and absolute angle.
+    lama_msgs::Crossing rel_crossing_;  //!< Crossing descriptor with relative position and relative angle.
 
     tf::TransformListener tf_listener_;
-    crossing_detector::CostmapCrossingDetector crossing_detector_;  //!> Compute the crossing.
-    goto_crossing::CrossingGoer crossing_goer_;  //!> Compute the twist to go to crossing center.
-    nj_oa_costmap::TwistHandler obstacle_avoider_;  //!> Compute the twist for obstacle avoidance.
+    crossing_detector::CostmapCrossingDetector crossing_detector_;  //!< Compute the crossing.
+    goto_crossing::CrossingGoer crossing_goer_;  //!< Compute the twist to go to crossing center.
+    nj_oa_costmap::TwistHandler obstacle_avoider_;  //!< Compute the twist for obstacle avoidance.
 };
 
 } // namespace nj_costmap

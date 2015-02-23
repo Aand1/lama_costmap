@@ -22,13 +22,13 @@ class TwistHandler : public nj_oa_laser::TwistHandler
 
     geometry_msgs::Twist getTwist(const nav_msgs::OccupancyGrid& map);
 
-    std::string laser_frame;  //!> Name of the frame the map is based on.
-    double fake_laser_beam_count; //!> beam count for the scan obtained from the map. Should be at least 2.
-    double range_max;  //!> (m), max range for beams that don't encounter any occupied or unknown point on the map.
+    std::string laser_frame;  //!< Name of the frame the map is based on.
+    double fake_laser_beam_count; //!< beam count for the scan obtained from the map. Should be at least 2.
+    double range_max;  //!< (m), max range for beams that don't encounter any occupied or unknown point on the map.
 
   private:
 
-    map_ray_caster::MapRayCaster ray_caster_; //!> Ray casting with cache to compute a fake LaserScan.
+    map_ray_caster::MapRayCaster ray_caster_; //!< Ray casting with cache to compute a fake LaserScan.
     tf::TransformListener tf_listerner_;
 };
 

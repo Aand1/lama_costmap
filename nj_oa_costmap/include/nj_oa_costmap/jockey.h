@@ -76,9 +76,9 @@ class Jockey : public nj_oa_laser::Jockey
     std::string base_laser_frame_;
 
     // Hard-coded parameters.
-    const static double fake_laser_beam_count_; //!> beam count for the scan obtained from the map.
-    const static double range_max_;  //!> (m), max range for beams that don't
-                                     //!> encounter any occupied or unknown point on the map.
+    const static double fake_laser_beam_count_; //!< beam count for the scan obtained from the map.
+    const static double range_max_;  //!< (m), max range for beams that don't
+                                     //!< encounter any occupied or unknown point on the map.
 
     // Internals.
     TwistHandler twist_handler_;
