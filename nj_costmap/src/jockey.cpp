@@ -58,16 +58,23 @@ void Jockey::onTraverse()
       }
       if (rel_crossing_.frontiers.size() == 1)
       {
-        if ((rel_crossing_.frontiers[0].angle > M_PI_2) ||
-              (rel_crossing_.frontiers[0].angle < -M_PI_2))
+        if ((std::abs(rel_crossing_.frontiers[0].angle) > M_PI_2))
+        {
+          goto_crossing = false;
+        }
+      }
+      if (rel_crossing_.frontiers.size() == 2)
+      {
+        if ((std::abs(rel_crossing_.frontiers[0].angle) > M_PI_2) &&
+              (std::abs(rel_crossing_.frontiers[1].angle) > M_PI_2))
         {
           goto_crossing = false;
         }
       }
       if (goto_crossing)
       {
-        // Go to the crossing center if the number of exits is at least 2
-        // or if the sole exit is in front of the robot.
+        // Go to the crossing center if the number of exits is at least 3
+        // or if one exit is in front of the robot.
         bool goal_reached = crossing_goer_.goto_crossing(rel_crossing_, twist);
         pub_twist_.publish(twist);
         ROS_DEBUG("Go to crossing");
