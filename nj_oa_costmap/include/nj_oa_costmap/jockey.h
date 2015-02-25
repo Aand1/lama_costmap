@@ -43,6 +43,9 @@
  *     (rad.m^-1.s^-1).
  * - ~laser_frame, String, "base_laser_link", frame_id of the LaserScan
  *     messages that are used to build the local map.
+ * - ~fake_laser_beam_count, Int, 40, beam count for the scan obtained from the
+ *     map.
+ * - ~range_max, Float, 5, max. range for the fake laser beams (m).
  */
 
 #ifndef NJ_OA_COSTMAP_JOCKEY_H
@@ -58,7 +61,8 @@
 
 #include <nj_oa_costmap/twist_handler.h>
 
-namespace nj_oa_costmap {
+namespace nj_oa_costmap
+{
 
 class Jockey : public nj_oa_laser::Jockey
 {
@@ -68,17 +72,13 @@ class Jockey : public nj_oa_laser::Jockey
 
     virtual void onTraverse();
 
+  protected :
+
+    void initTwistHandlerParam(TwistHandler& twist_handler);
+
   private :
 
     void handleMap(const nav_msgs::OccupancyGridConstPtr& msg);
-
-    // Parameters shown outside.
-    std::string base_laser_frame_;
-
-    // Hard-coded parameters.
-    const static double fake_laser_beam_count_; //!< beam count for the scan obtained from the map.
-    const static double range_max_;  //!< (m), max range for beams that don't
-                                     //!< encounter any occupied or unknown point on the map.
 
     // Internals.
     TwistHandler twist_handler_;

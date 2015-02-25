@@ -1,11 +1,12 @@
 #include <nj_oa_costmap/twist_handler.h>
 
-namespace nj_oa_costmap {
+namespace nj_oa_costmap
+{
 
 TwistHandler::TwistHandler(const double robot_radius, const std::string& laser_frame) :
   nj_oa_laser::TwistHandler(robot_radius),
   laser_frame(laser_frame),
-  fake_laser_beam_count(20),
+  fake_laser_beam_count(40),
   range_max(5)
 {
 }

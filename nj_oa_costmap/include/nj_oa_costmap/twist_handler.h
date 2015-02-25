@@ -12,7 +12,8 @@
 #include <map_ray_caster/map_ray_caster.h>
 #include <nj_oa_laser/twist_handler.h>
 
-namespace nj_oa_costmap {
+namespace nj_oa_costmap
+{
 
 class TwistHandler : public nj_oa_laser::TwistHandler
 {
@@ -23,7 +24,7 @@ class TwistHandler : public nj_oa_laser::TwistHandler
     geometry_msgs::Twist getTwist(const nav_msgs::OccupancyGrid& map);
 
     std::string laser_frame;  //!< Name of the frame the map is based on.
-    double fake_laser_beam_count; //!< beam count for the scan obtained from the map. Should be at least 2.
+    unsigned int fake_laser_beam_count; //!< beam count for the scan obtained from the map. Should be at least 2.
     double range_max;  //!< (m), max range for beams that don't encounter any occupied or unknown point on the map.
 
   private:
