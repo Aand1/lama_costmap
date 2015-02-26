@@ -80,6 +80,8 @@ class Jockey : public lama_jockeys::NavigatingJockey
 
   private:
 
+    void initTwistHandlerParam();
+
     // Publishers and subscribers.
     ros::Publisher pub_crossing_marker_;
     ros::Publisher pub_exits_marker_;

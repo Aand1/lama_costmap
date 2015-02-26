@@ -9,26 +9,49 @@ Jockey::Jockey(const std::string& name, const double frontier_width) :
   range_cutoff_(0),
   has_crossing_(false),
   crossing_detector_(frontier_width),
-  obstacle_avoider_(frontier_width / 2, "")
+  obstacle_avoider_(frontier_width / 2, "base_laser_link")
 {
   private_nh_.getParam("odom_frame", odom_frame_);
   range_cutoff_set_ = private_nh_.getParam("range_cutoff", range_cutoff_);
-
-  std::string laser_frame = "base_laser_link";
-  private_nh_.getParam("laser_frame", laser_frame);
-  obstacle_avoider_.laser_frame = laser_frame;
-
-  double robot_radius;
-  if (private_nh_.getParam("robot_radius", robot_radius))
-  {
-    obstacle_avoider_.robot_radius = robot_radius;
-  }
 
   pub_twist_ = private_nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
   pub_crossing_marker_ = private_nh_.advertise<visualization_msgs::Marker>("crossing_marker", 50, true);
   pub_exits_marker_ = private_nh_.advertise<visualization_msgs::Marker>("exits_marker", 50, true);
   pub_place_profile_ = private_nh_.advertise<sensor_msgs::PointCloud>("place_profile_cloud", 50, true);
   pub_crossing_ = private_nh_.advertise<lama_msgs::Crossing>("abs_crossing", 50, true);
+
+  initTwistHandlerParam();
+}
+
+void Jockey::initTwistHandlerParam()
+{
+  // Parameters from nj_oa_laser::TwistHandler.
+  private_nh_.getParam("robot_radius", obstacle_avoider_.robot_radius);
+  private_nh_.getParam("min_distance", obstacle_avoider_.min_distance);
+  private_nh_.getParam("long_distance", obstacle_avoider_.long_distance);
+  private_nh_.getParam("turnrate_collide", obstacle_avoider_.turnrate_collide);
+  private_nh_.getParam("vel_close_obstacle", obstacle_avoider_.vel_close_obstacle);
+  private_nh_.getParam("turnrate_factor", obstacle_avoider_.turnrate_factor);
+  private_nh_.getParam("max_linear_velocity", obstacle_avoider_.max_linear_velocity);
+  private_nh_.getParam("max_angular_velocity", obstacle_avoider_.max_angular_velocity);
+
+  // Parameters from nj_oa_costmap::TwistHandler.
+  private_nh_.getParam("laser_frame", obstacle_avoider_.laser_frame);
+
+  int fake_laser_beam_count;
+  if (private_nh_.getParam("fake_laser_beam_count", fake_laser_beam_count))
+  {
+    if (fake_laser_beam_count > 1)
+    {
+      obstacle_avoider_.fake_laser_beam_count = fake_laser_beam_count;
+    }
+    else
+    {
+      ROS_ERROR_STREAM("Parameter " << private_nh_.getNamespace() << "/fake_laser_beam_count must be at least 2, setting to default");
+    }
+  }
+
+  private_nh_.getParam("range_max", obstacle_avoider_.range_max);
 }
 
 void Jockey::onTraverse()
