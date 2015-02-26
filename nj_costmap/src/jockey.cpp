@@ -8,6 +8,7 @@ Jockey::Jockey(const std::string& name, const double frontier_width) :
   odom_frame_("odom"),
   range_cutoff_(0),
   has_crossing_(false),
+  last_map_orientation_(0),
   crossing_detector_(frontier_width),
   obstacle_avoider_(frontier_width / 2, "base_laser_link")
 {
@@ -168,21 +169,27 @@ void Jockey::handleCostmap(const nav_msgs::OccupancyGridConstPtr& msg)
 
   // Get the rotation between odom_frame_ and the map frame.
   tf::StampedTransform tr;
+  bool lookup_successfull = false;
   try
   {
     tf_listener_.waitForTransform(odom_frame_, map_.header.frame_id,
         map_.header.stamp, ros::Duration(0.2));
     tf_listener_.lookupTransform(odom_frame_, map_.header.frame_id, 
         map_.header.stamp, tr);
+    lookup_successfull = true;
   }
   catch (tf::TransformException ex)
   {
     ROS_ERROR("%s", ex.what());
   }
-  // ROS_INFO("%s, %s", odom_frame_.c_str(), map_.header.frame_id.c_str());  // DEBUG
 
-  // Angle from LaserScan (on which the map is base) to the map.
-  const double map_relative_orientation = tf::getYaw(tr.getRotation());
+  // Angle from LaserScan (on which the map is based) to the map.
+  double map_relative_orientation = last_map_orientation_;
+  if (lookup_successfull)
+  {
+    map_relative_orientation = tf::getYaw(tr.getRotation());
+    last_map_orientation_ = map_relative_orientation;
+  }
 
   // Transform the crossing with absolute angles to relative angles.
   rel_crossing_ = abs_crossing_;
@@ -192,14 +199,14 @@ void Jockey::handleCostmap(const nav_msgs::OccupancyGridConstPtr& msg)
   for (size_t i = 0; i < rel_crossing_.frontiers.size(); ++i)
     ROS_DEBUG("Relative frontier angle = %.3f", rel_crossing_.frontiers[i].angle);
 
-  // Visualization: a sphere at detected crossing center
+  // Visualization: a sphere at detected crossing center.
   if (pub_crossing_marker_.getNumSubscribers())
   {
     visualization_msgs::Marker m = lama_common::getCrossingCenterMarker(map_.header.frame_id, abs_crossing_);
     pub_crossing_marker_.publish(m);
   }
 
-  // Visualization: a line at each detected road
+  // Visualization: a line at each detected road.
   if (pub_exits_marker_.getNumSubscribers())
   {
     visualization_msgs::Marker m = lama_common::getFrontiersMarker(map_.header.frame_id, abs_crossing_);

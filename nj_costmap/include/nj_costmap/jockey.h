@@ -99,6 +99,7 @@ class Jockey : public lama_jockeys::NavigatingJockey
     bool has_crossing_;  //!< true when a new crossing was computed.
     bool range_cutoff_set_;
     nav_msgs::OccupancyGrid map_;  //!< Last received map.
+    double last_map_orientation_;  //!< Map orientation of last received map.
     lama_msgs::Crossing abs_crossing_;  //!< Crossing descriptor with relative position and absolute angle.
     lama_msgs::Crossing rel_crossing_;  //!< Crossing descriptor with relative position and relative angle.
 
