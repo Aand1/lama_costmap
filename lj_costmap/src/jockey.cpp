@@ -4,6 +4,7 @@ namespace lj_costmap {
 
 Jockey::Jockey(std::string name, const double frontier_width, const double max_frontier_angle) :
   LocalizingJockey(name),
+  range_cutoff_(0),
   data_received_(false),
   place_profile_interface_name_(name + "_place_profile"),
   crossing_interface_name_(name + "_crossing"),
@@ -13,6 +14,7 @@ Jockey::Jockey(std::string name, const double frontier_width, const double max_f
   private_nh_.getParam("place_profile_interface_name", place_profile_interface_name_);
   private_nh_.getParam("crossing_interface_name", crossing_interface_name_);
   private_nh_.getParam("dissimilarity_server_name", dissimilarity_server_name_);
+  range_cutoff_set_ = private_nh_.getParam("range_cutoff", range_cutoff_);
 
   initMapPlaceProfileInterface();
   initMapCrossingInterface();
@@ -131,7 +133,15 @@ void Jockey::onGetVertexDescriptor()
 
   // Add the Crossing to the descriptor list.
   lama_msgs::SetCrossing crossing_setter_srv;
-  lama_msgs::Crossing crossing = crossing_detector_.crossingDescriptor(map_);
+  lama_msgs::Crossing crossing;
+  if (range_cutoff_set_)
+  {
+    crossing = crossing_detector_.crossingDescriptor(map_, range_cutoff_);
+  }
+  else
+  {
+    crossing = crossing_detector_.crossingDescriptor(map_);
+  }
   crossing_setter_srv.request.descriptor = crossing;
   if (!crossing_setter_.call(crossing_setter_srv))
   {

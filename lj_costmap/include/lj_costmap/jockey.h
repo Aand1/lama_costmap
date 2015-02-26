@@ -34,6 +34,8 @@
  * - costmap_interface_name, String, jockey_name + "_place_profile", name of the map interface for place profiles.
  * - crossing_interface_name, String, jockey_name + "_crossing", name of the map interface for crossing.
  * - dissimilarity_server_name, String, "compute_dissimilarity", name of the dissimilarity server.
+ * - ~range_cutoff, Float, 0, points farther than this are considered to be
+ *     free of obstacle and frontiers may exist. 0 means ignore.
  */
 
 #ifndef LJ_COSTMAP_JOCKEY_H
@@ -81,7 +83,12 @@ class Jockey : public lama_jockeys::LocalizingJockey
     lama_msgs::DescriptorLink placeProfileDescriptorLink(const int32_t id);
     lama_msgs::DescriptorLink crossingDescriptorLink(const int32_t id);
 
+    // ROS parameters.
+    double range_cutoff_;  //!< A range longer that this is considered to be free (m).
+
+    // Internals.
     bool data_received_;
+    bool range_cutoff_set_;
 
     // Reception and storage of OccupancyGrid and PlaceProfile.
     ros::Subscriber costmap_handler_;

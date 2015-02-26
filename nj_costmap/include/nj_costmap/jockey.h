@@ -40,6 +40,8 @@
  *     a constructor parameter).
  * - ~laser_frame, String, "/base_laser_link", name of the LaserScan frame the
  *     map is based on.
+ * - ~range_cutoff, Float, 0, points farther than this are considered to be
+ *     free of obstacle and frontiers may exist. 0 means ignore.
  */
 
 #ifndef NJ_COSTMAP_JOCKEY_H
@@ -87,9 +89,13 @@ class Jockey : public lama_jockeys::NavigatingJockey
     
     ros::Subscriber costmap_handler_;
 
-    // Internals.
+    // ROS parameters.
     std::string odom_frame_;
+    double range_cutoff_;  //!< A range longer that this is considered to be free (m).
+
+    // Internals.
     bool has_crossing_;  //!< true when a new crossing was computed.
+    bool range_cutoff_set_;
     nav_msgs::OccupancyGrid map_;  //!< Last received map.
     lama_msgs::Crossing abs_crossing_;  //!< Crossing descriptor with relative position and absolute angle.
     lama_msgs::Crossing rel_crossing_;  //!< Crossing descriptor with relative position and relative angle.

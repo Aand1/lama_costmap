@@ -12,13 +12,9 @@ Jockey::Jockey(const std::string& name, const double robot_radius) :
 
 void Jockey::initTwistHandlerParam(TwistHandler& twist_handler)
 {
-  nj_oa_laser::Jockey::initTwistHandlerParam(twist_handler_);
+  nj_oa_laser::Jockey::initTwistHandlerParam(twist_handler);
 
-  std::string laser_frame;
-  if (private_nh_.getParam("laser_frame", laser_frame))
-  {
-    twist_handler.laser_frame = laser_frame;
-  }
+  private_nh_.getParam("laser_frame", twist_handler.laser_frame);
 
   int fake_laser_beam_count;
   if (private_nh_.getParam("fake_laser_beam_count", fake_laser_beam_count))
@@ -33,11 +29,7 @@ void Jockey::initTwistHandlerParam(TwistHandler& twist_handler)
     }
   }
 
-  double range_max;
-  if (private_nh_.getParam("range_max", range_max))
-  {
-    twist_handler.range_max = range_max;
-  }
+  private_nh_.getParam("range_max", twist_handler.range_max);
 }
 
 void Jockey::onTraverse()

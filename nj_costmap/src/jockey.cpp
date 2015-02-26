@@ -6,11 +6,13 @@ namespace nj_costmap
 Jockey::Jockey(const std::string& name, const double frontier_width) :
   lama_jockeys::NavigatingJockey(name),
   odom_frame_("odom"),
+  range_cutoff_(0),
   has_crossing_(false),
   crossing_detector_(frontier_width),
   obstacle_avoider_(frontier_width / 2, "")
 {
   private_nh_.getParam("odom_frame", odom_frame_);
+  range_cutoff_set_ = private_nh_.getParam("range_cutoff", range_cutoff_);
 
   std::string laser_frame = "base_laser_link";
   private_nh_.getParam("laser_frame", laser_frame);
@@ -129,7 +131,14 @@ void Jockey::onContinue()
 void Jockey::handleCostmap(const nav_msgs::OccupancyGridConstPtr& msg)
 {
   map_ = *msg;
-  abs_crossing_ = crossing_detector_.crossingDescriptor(map_);
+  if (range_cutoff_set_)
+  {
+    abs_crossing_ = crossing_detector_.crossingDescriptor(map_, range_cutoff_);
+  }
+  else
+  {
+    abs_crossing_ = crossing_detector_.crossingDescriptor(map_);
+  }
  
   ROS_DEBUG("Crossing (%.3f, %.3f, %.3f), number of exits: %zu",
       abs_crossing_.center.x, abs_crossing_.center.y, abs_crossing_.radius, abs_crossing_.frontiers.size());
