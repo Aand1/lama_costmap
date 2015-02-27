@@ -1,4 +1,4 @@
-/*
+/**
  * Localizing Jockey based on local costmap (costmap position is relative to
  * the sensor but orientation is absolute).
  *
@@ -55,13 +55,14 @@
 
 #include <crossing_detector/costmap_crossing_detector.h>
 
-namespace lj_costmap {
+namespace lj_costmap
+{
 
 class Jockey : public lama_jockeys::LocalizingJockey
 {
   public:
 
-    Jockey(std::string name, const double frontier_width, const double max_frontier_angle=0.785);
+    Jockey(std::string name, double frontier_width, double max_frontier_angle=0.785);
 
     virtual void onGetVertexDescriptor();
     virtual void onGetEdgesDescriptors();
@@ -80,8 +81,8 @@ class Jockey : public lama_jockeys::LocalizingJockey
     void getData();
     void handleMap(const nav_msgs::OccupancyGridConstPtr& msg);
 
-    lama_msgs::DescriptorLink placeProfileDescriptorLink(const int32_t id);
-    lama_msgs::DescriptorLink crossingDescriptorLink(const int32_t id);
+    lama_msgs::DescriptorLink placeProfileDescriptorLink(int32_t id);
+    lama_msgs::DescriptorLink crossingDescriptorLink(int32_t id);
 
     // ROS parameters.
     double range_cutoff_;  //!< A range longer that this is considered to be free (m).

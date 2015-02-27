@@ -1,8 +1,9 @@
 #include <lj_costmap/jockey.h>
 
-namespace lj_costmap {
+namespace lj_costmap
+{
 
-Jockey::Jockey(std::string name, const double frontier_width, const double max_frontier_angle) :
+Jockey::Jockey(std::string name, double frontier_width, double max_frontier_angle) :
   LocalizingJockey(name),
   range_cutoff_(0),
   data_received_(false),
@@ -23,7 +24,7 @@ Jockey::Jockey(std::string name, const double frontier_width, const double max_f
   dissimilarity_server_ = nh_.serviceClient<polygon_matcher::PolygonDissimilarity>(dissimilarity_server_name_);
 }
 
-/* Create the getter and setter services for LaserScan descriptors.
+/** Create the getter and setter services for LaserScan descriptors.
  */
 void Jockey::initMapPlaceProfileInterface()
 {
@@ -46,7 +47,7 @@ void Jockey::initMapPlaceProfileInterface()
   place_profile_setter_.waitForExistence();
 }
 
-/* Create the setter services for Crossing descriptors.
+/** Create the setter services for Crossing descriptors.
  */
 void Jockey::initMapCrossingInterface()
 {
@@ -66,7 +67,7 @@ void Jockey::initMapCrossingInterface()
   crossing_setter_.waitForExistence();
 }
 
-/* Start the subscriber, wait for an OccupancyGrid and exit upon reception.
+/** Start the subscriber, wait for an OccupancyGrid and exit upon reception.
  */
 void Jockey::getData()
 {
@@ -91,7 +92,7 @@ void Jockey::getData()
   }
 }
 
-/* Callback for OccupancyGrid subscriber, receive a message and store it.
+/** Callback for OccupancyGrid subscriber, receive a message and store it.
  */
 void Jockey::handleMap(const nav_msgs::OccupancyGridConstPtr& msg)
 {
@@ -100,7 +101,7 @@ void Jockey::handleMap(const nav_msgs::OccupancyGridConstPtr& msg)
   data_received_ = true;
 }
 
-/* Return the vertex descriptors associated with the current robot position through result_.
+/** Return the vertex descriptors associated with the current robot position through result_.
  *
  * The descriptors are a LaserScan and a Crossing.
  */
@@ -257,9 +258,9 @@ void Jockey::onGetDissimilarity()
   server_.setSucceeded(result_);
 }
 
-/* Return a DescriptorLink for the PlaceProfile interface
+/** Return a DescriptorLink for the PlaceProfile interface
  */
-lama_msgs::DescriptorLink Jockey::placeProfileDescriptorLink(const int32_t id)
+lama_msgs::DescriptorLink Jockey::placeProfileDescriptorLink(int32_t id)
 {
   lama_msgs::DescriptorLink descriptor_link;
   descriptor_link.descriptor_id = id;
@@ -267,9 +268,9 @@ lama_msgs::DescriptorLink Jockey::placeProfileDescriptorLink(const int32_t id)
   return descriptor_link;
 }
 
-/* Return a DescriptorLink for the Crossing interface
+/** Return a DescriptorLink for the Crossing interface
  */
-lama_msgs::DescriptorLink Jockey::crossingDescriptorLink(const int32_t id)
+lama_msgs::DescriptorLink Jockey::crossingDescriptorLink(int32_t id)
 {
   lama_msgs::DescriptorLink descriptor_link;
   descriptor_link.descriptor_id = id;
