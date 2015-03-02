@@ -160,8 +160,9 @@ void Jockey::handleCostmap(const nav_msgs::OccupancyGridConstPtr& msg)
     if (std::abs(range_cutoff_ - (-1)) < 1e-10)
     {
       // Adapt the range cut-off by first computing the radius.
-      abs_crossing_ = crossing_detector_.crossingDescriptor(map_, range_cutoff_);
+      abs_crossing_ = crossing_detector_.crossingDescriptor(map_);
       abs_crossing_.frontiers = crossing_detector_.frontiers(map_, 1.5 * abs_crossing_.radius);
+      ROS_DEBUG("Adapative range cut-off: %.3f", 1.5 * abs_crossing_.radius);
     }
     else
     {
