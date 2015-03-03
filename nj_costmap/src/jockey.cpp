@@ -155,7 +155,7 @@ void Jockey::onContinue()
 void Jockey::handleCostmap(const nav_msgs::OccupancyGridConstPtr& msg)
 {
   map_ = *msg;
-  if (range_cutoff_set_)
+/*  if (range_cutoff_set_)
   {
     if (std::abs(range_cutoff_ - (-1)) < 1e-10)
     {
@@ -167,14 +167,22 @@ void Jockey::handleCostmap(const nav_msgs::OccupancyGridConstPtr& msg)
     else
     {
       abs_crossing_ = crossing_detector_.crossingDescriptor(map_, range_cutoff_);
-    }
+      abs_crossing_ = crossing_detector_.crossingDescriptor(map_, range_cutoff_);
+      float optimal_cutoff = 1.2*abs_crossing_.radius;
+      abs_crossing_ = crossing_detector_.crossingDescriptor(map_,optimal_cutoff);
   }
   else
-  {
+*/  {
     abs_crossing_ = crossing_detector_.crossingDescriptor(map_);
+    ROS_DEBUG("Crossing (%.3f, %.3f, %.3f), number of exits: %zu",
+          abs_crossing_.center.x, abs_crossing_.center.y, abs_crossing_.radius, abs_crossing_.frontiers.size());
+
+    float optimal_cutoff = 1.8*abs_crossing_.radius;
+    abs_crossing_ = crossing_detector_.crossingDescriptor(map_,optimal_cutoff);
+
   }
  
-  ROS_DEBUG("Crossing (%.3f, %.3f, %.3f), number of exits: %zu",
+  ROS_DEBUG("OptimalCrossing (%.3f, %.3f, %.3f), number of exits: %zu",
       abs_crossing_.center.x, abs_crossing_.center.y, abs_crossing_.radius, abs_crossing_.frontiers.size());
 
   // Get the rotation between odom_frame_ and the map frame.
@@ -210,14 +218,14 @@ void Jockey::handleCostmap(const nav_msgs::OccupancyGridConstPtr& msg)
     ROS_DEBUG("Relative frontier angle = %.3f", rel_crossing_.frontiers[i].angle);
 
   // Visualization: a sphere at detected crossing center.
-  if (pub_crossing_marker_.getNumSubscribers())
+//  if (pub_crossing_marker_.getNumSubscribers())
   {
     visualization_msgs::Marker m = lama_common::getCrossingCenterMarker(map_.header.frame_id, abs_crossing_);
     pub_crossing_marker_.publish(m);
   }
 
   // Visualization: a line at each detected road.
-  if (pub_exits_marker_.getNumSubscribers())
+//  if (pub_exits_marker_.getNumSubscribers())
   {
     visualization_msgs::Marker m = lama_common::getFrontiersMarker(map_.header.frame_id, abs_crossing_);
     pub_exits_marker_.publish(m);
