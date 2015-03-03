@@ -161,21 +161,31 @@ void Jockey::handleCostmap(const nav_msgs::OccupancyGridConstPtr& msg)
     {
       // Adapt the range cut-off by first computing the radius.
       abs_crossing_ = crossing_detector_.crossingDescriptor(map_);
-      abs_crossing_.frontiers = crossing_detector_.frontiers(map_, 1.5 * abs_crossing_.radius);
-      ROS_DEBUG("Adapative range cut-off: %.3f", 1.5 * abs_crossing_.radius);
+      ROS_DEBUG("Raw Crossing (%.3f, %.3f, %.3f), number of exits: %zu",
+          abs_crossing_.center.x, abs_crossing_.center.y, abs_crossing_.radius,
+          abs_crossing_.frontiers.size());
+
+      abs_crossing_ = crossing_detector_.crossingDescriptor(map_, 1.8 * abs_crossing_.radius);
+      ROS_DEBUG("Adapative range cut-off: %.3f", 1.8 * abs_crossing_.radius);
+      ROS_DEBUG("Crossing with adapted range (%.3f, %.3f, %.3f), number of exits: %zu",
+          abs_crossing_.center.x, abs_crossing_.center.y, abs_crossing_.radius,
+          abs_crossing_.frontiers.size());
     }
     else
     {
       abs_crossing_ = crossing_detector_.crossingDescriptor(map_, range_cutoff_);
+      ROS_DEBUG("Crossing: (%.3f, %.3f, %.3f), range cut-off: %.3f, number of exits: %zu",
+          abs_crossing_.center.x, abs_crossing_.center.y, abs_crossing_.radius,
+          range_cutoff_, abs_crossing_.frontiers.size());
     }
   }
   else
   {
     abs_crossing_ = crossing_detector_.crossingDescriptor(map_);
+    ROS_DEBUG("Crossing (%.3f, %.3f, %.3f), number of exits: %zu",
+        abs_crossing_.center.x, abs_crossing_.center.y, abs_crossing_.radius, abs_crossing_.frontiers.size());
   }
  
-  ROS_DEBUG("Crossing (%.3f, %.3f, %.3f), number of exits: %zu",
-      abs_crossing_.center.x, abs_crossing_.center.y, abs_crossing_.radius, abs_crossing_.frontiers.size());
 
   // Get the rotation between odom_frame_ and the map frame.
   tf::StampedTransform tr;
