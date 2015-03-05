@@ -135,14 +135,14 @@ void Jockey::onGetVertexDescriptor()
   // Add the Crossing to the descriptor list.
   lama_msgs::SetCrossing crossing_setter_srv;
   lama_msgs::Crossing crossing;
-  if (range_cutoff_set_)
-  {
-    crossing = crossing_detector_.crossingDescriptor(map_, range_cutoff_);
-  }
-  else
-  {
-    crossing = crossing_detector_.crossingDescriptor(map_);
-  }
+  
+  //find crossing without cutoff
+  crossing = crossing_detector_.crossingDescriptor(map_);
+  //use crossing radius for optimal cutoff computation
+  float optimal_cutoff = 2*crossing.radius;
+  //compute new crossing from cutoff map
+  crossing = crossing_detector_.crossingDescriptor(map_,optimal_cutoff);
+  
   crossing_setter_srv.request.descriptor = crossing;
   if (!crossing_setter_.call(crossing_setter_srv))
   {

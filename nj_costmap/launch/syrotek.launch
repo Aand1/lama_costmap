@@ -4,11 +4,11 @@
 
   <!--
   rosrun rviz rviz -d $(rospack find nj_costmap)/worlds/syrotek.rviz
-  -->
   <node name="rviz" pkg="rviz" type="rviz"
     args="-d $(find nj_costmap)/worlds/syrotek.rviz">
   </node>
 
+  -->
   <!--
   rosrun local_map local_map __name:=costmap scan:=/syros/laser_laser
   -->

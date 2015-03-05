@@ -155,32 +155,14 @@ void Jockey::onContinue()
 void Jockey::handleCostmap(const nav_msgs::OccupancyGridConstPtr& msg)
 {
   map_ = *msg;
-/*  if (range_cutoff_set_)
-  {
-    if (std::abs(range_cutoff_ - (-1)) < 1e-10)
-    {
-      // Adapt the range cut-off by first computing the radius.
-      abs_crossing_ = crossing_detector_.crossingDescriptor(map_);
-      abs_crossing_.frontiers = crossing_detector_.frontiers(map_, 1.5 * abs_crossing_.radius);
-      ROS_DEBUG("Adapative range cut-off: %.3f", 1.5 * abs_crossing_.radius);
-    }
-    else
-    {
-      abs_crossing_ = crossing_detector_.crossingDescriptor(map_, range_cutoff_);
-      abs_crossing_ = crossing_detector_.crossingDescriptor(map_, range_cutoff_);
-      float optimal_cutoff = 1.2*abs_crossing_.radius;
-      abs_crossing_ = crossing_detector_.crossingDescriptor(map_,optimal_cutoff);
-  }
-  else
-*/  {
-    abs_crossing_ = crossing_detector_.crossingDescriptor(map_);
-    ROS_DEBUG("Crossing (%.3f, %.3f, %.3f), number of exits: %zu",
-          abs_crossing_.center.x, abs_crossing_.center.y, abs_crossing_.radius, abs_crossing_.frontiers.size());
+  //find crossing without cutoff
+  abs_crossing_ = crossing_detector_.crossingDescriptor(map_);
+  ROS_DEBUG("Crossing (%.3f, %.3f, %.3f), number of exits: %zu",
+      abs_crossing_.center.x, abs_crossing_.center.y, abs_crossing_.radius, abs_crossing_.frontiers.size());
 
-    float optimal_cutoff = 1.8*abs_crossing_.radius;
-    abs_crossing_ = crossing_detector_.crossingDescriptor(map_,optimal_cutoff);
-
-  }
+  //use crossing radius for optimal cutoff computation
+  float optimal_cutoff = 2*abs_crossing_.radius;
+  //compute new crossing from cutoff map
  
   ROS_DEBUG("OptimalCrossing (%.3f, %.3f, %.3f), number of exits: %zu",
       abs_crossing_.center.x, abs_crossing_.center.y, abs_crossing_.radius, abs_crossing_.frontiers.size());
