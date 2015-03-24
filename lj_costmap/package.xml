@@ -2,7 +2,7 @@
 <package>
   <name>lj_costmap</name>
   <version>0.1.2</version>
-  <description>The lj_costmap package implements a localizing jockey for the
+  <description>Implements a localizing jockey for the
 	  Large Maps framework (LaMa) based on a local costmap (costmap position is
 	  relative to the sensor but orientation is absolute).
 
@@ -32,7 +32,7 @@
   <build_depend>lama_jockeys</build_depend>
   <build_depend>lama_msgs</build_depend>
   <build_depend>nav_msgs</build_depend>
-  <build_depend>polygon_matcher</build_depend>
+  <build_depend>place_matcher_msgs</build_depend>
   <build_depend>roscpp</build_depend>
 
   <run_depend>crossing_detector</run_depend>
@@ -41,7 +41,7 @@
   <run_depend>lama_jockeys</run_depend>
   <run_depend>lama_msgs</run_depend>
   <run_depend>nav_msgs</run_depend>
-  <run_depend>polygon_matcher</run_depend>
+  <run_depend>place_matcher_msgs</run_depend>
   <run_depend>roscpp</run_depend>
 
 

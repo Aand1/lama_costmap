@@ -21,7 +21,7 @@ Jockey::Jockey(std::string name, double frontier_width, double max_frontier_angl
   initMapCrossingInterface();
 
   // Initialize the client for the dissimilarity server.
-  dissimilarity_server_ = nh_.serviceClient<polygon_matcher::PolygonDissimilarity>(dissimilarity_server_name_);
+  dissimilarity_server_ = nh_.serviceClient<place_matcher_msgs::PolygonDissimilarity>(dissimilarity_server_name_);
 }
 
 /** Create the getter and setter services for LaserScan descriptors.
@@ -230,8 +230,8 @@ void Jockey::onGetDissimilarity()
     polygons.push_back(profile_srv.response.descriptor.polygon);
   }
   
-  // Compare them to the current polygon by calling one of the pm_* service.
-  polygon_matcher::PolygonDissimilarity dissimi_srv;
+  // Compare them to the current polygon by calling one of the polygon_matcher service.
+  place_matcher_msgs::PolygonDissimilarity dissimi_srv;
   dissimi_srv.request.polygon1 = profile_.polygon;
   result_.idata.clear();
   result_.fdata.clear();
