@@ -31,10 +31,13 @@
  *
  * Parameters:
  * - name, type, default name, description
- * - costmap_interface_name, String, jockey_name + "_place_profile", name of the map interface for place profiles.
- * - crossing_interface_name, String, jockey_name + "_crossing", name of the map interface for crossing.
- * - dissimilarity_server_name, String, "compute_dissimilarity", name of the dissimilarity server.
- * - ~range_cutoff, Float, 0, points farther than this are considered to be
+ * - ~/costmap_interface_name, String, jockey_name + "_place_profile", name of the map interface for place profiles.
+ * - ~/crossing_interface_name, String, jockey_name + "_crossing", name of the map interface for crossing.
+ * - ~/localize_service, String, "localize_in_vertex", name of the
+ *     dissimilarity service for LOCALIZE_IN_VERTEX (only the pose is considered).
+ * - ~/dissimilarity_server_name, String, "compute_dissimilarity", name of the
+ *     dissimilarity service (only the dissimilarity is considered).
+ * - ~/range_cutoff, Float, 0, points farther than this are considered to be
  *     free of obstacle and frontiers may exist. 0 means ignore.
  */
 
@@ -65,12 +68,8 @@ class Jockey : public lama_jockeys::LocalizingJockey
     Jockey(std::string name, double frontier_width, double max_frontier_angle=0.785);
 
     virtual void onGetVertexDescriptor();
-    virtual void onGetEdgesDescriptors();
     virtual void onLocalizeInVertex();
-    virtual void onLocalizeEdge();
     virtual void onGetDissimilarity();
-    // virtual void onInterrupt();
-    // virtual void onContinue();
 
     void setDissimilarityServerName(std::string name) {dissimilarity_server_name_ = name;}
 
@@ -78,7 +77,7 @@ class Jockey : public lama_jockeys::LocalizingJockey
 
     void initMapPlaceProfileInterface();
     void initMapCrossingInterface();
-    void getData();
+    void getLiveData();
     void handleMap(const nav_msgs::OccupancyGridConstPtr& msg);
 
     lama_msgs::DescriptorLink placeProfileDescriptorLink(int32_t id);
@@ -92,7 +91,6 @@ class Jockey : public lama_jockeys::LocalizingJockey
     bool range_cutoff_set_;
 
     // Reception and storage of OccupancyGrid and PlaceProfile.
-    ros::Subscriber costmap_handler_;
     nav_msgs::OccupancyGrid map_;
     lama_msgs::PlaceProfile profile_;
 
@@ -103,9 +101,10 @@ class Jockey : public lama_jockeys::LocalizingJockey
     std::string crossing_interface_name_;
     ros::ServiceClient crossing_setter_;
 
+    // LocalizeInVertex server.
+    std::string localize_service_;
     // Dissimilarity server.
     std::string dissimilarity_server_name_;
-    ros::ServiceClient dissimilarity_server_;
 
     crossing_detector::CostmapCrossingDetector crossing_detector_;
 };

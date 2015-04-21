@@ -9,27 +9,29 @@ Jockey::Jockey(std::string name, double frontier_width, double max_frontier_angl
   data_received_(false),
   place_profile_interface_name_(name + "_place_profile"),
   crossing_interface_name_(name + "_crossing"),
+  localize_service_("localize_in_vertex"),
   dissimilarity_server_name_("compute_dissimilarity"),
   crossing_detector_(frontier_width, max_frontier_angle)
 {
   private_nh_.getParam("place_profile_interface_name", place_profile_interface_name_);
   private_nh_.getParam("crossing_interface_name", crossing_interface_name_);
+  private_nh_.getParam("localize_service", localize_service_);
   private_nh_.getParam("dissimilarity_server_name", dissimilarity_server_name_);
   range_cutoff_set_ = private_nh_.getParam("range_cutoff", range_cutoff_);
 
   initMapPlaceProfileInterface();
   initMapCrossingInterface();
-
-  // Initialize the client for the dissimilarity server.
-  dissimilarity_server_ = nh_.serviceClient<place_matcher_msgs::PolygonDissimilarity>(dissimilarity_server_name_);
 }
 
-/** Create the getter and setter services for LaserScan descriptors.
+/** Create the getter and setter services for PlaceProfile descriptors.
  */
 void Jockey::initMapPlaceProfileInterface()
 {
   ros::ServiceClient client = nh_.serviceClient<lama_interfaces::AddInterface>("interface_factory");
-  client.waitForExistence();
+  while (ros::ok() && !client.waitForExistence(ros::Duration(5.0)))
+  {
+    ROS_WARN("Waiting for service /interface_factory");
+  }
   lama_interfaces::AddInterface srv;
   srv.request.interface_name = place_profile_interface_name_;
   srv.request.interface_type = lama_interfaces::AddInterfaceRequest::SERIALIZED;
@@ -37,14 +39,12 @@ void Jockey::initMapPlaceProfileInterface()
   srv.request.set_service_message = "lama_msgs/SetPlaceProfile";
   if (!client.call(srv))
   {
-    ROS_ERROR("Failed to create the Lama interface %s", place_profile_interface_name_.c_str());
+    ROS_ERROR_STREAM("Failed to create the LaMa interface " << place_profile_interface_name_);
     return;
   }
   // Initialize the clients for the getter and setter services (interface to map).
   place_profile_getter_ = nh_.serviceClient<lama_msgs::GetPlaceProfile>(srv.response.get_service_name);
-  place_profile_getter_.waitForExistence();
   place_profile_setter_ = nh_.serviceClient<lama_msgs::SetPlaceProfile>(srv.response.set_service_name);
-  place_profile_setter_.waitForExistence();
 }
 
 /** Create the setter services for Crossing descriptors.
@@ -52,7 +52,10 @@ void Jockey::initMapPlaceProfileInterface()
 void Jockey::initMapCrossingInterface()
 {
   ros::ServiceClient client = nh_.serviceClient<lama_interfaces::AddInterface>("interface_factory");
-  client.waitForExistence();
+  while (ros::ok() && !client.waitForExistence(ros::Duration(5.0)))
+  {
+    ROS_WARN("Waiting for service /interface_factory");
+  }
   lama_interfaces::AddInterface srv;
   srv.request.interface_name = crossing_interface_name_;
   srv.request.interface_type = lama_interfaces::AddInterfaceRequest::CLEARTEXT;
@@ -60,20 +63,21 @@ void Jockey::initMapCrossingInterface()
   srv.request.set_service_message = "lama_msgs/SetCrossing";
   if (!client.call(srv))
   {
-    ROS_ERROR("Failed to create the Lama interface %s", crossing_interface_name_.c_str());
+    ROS_ERROR("Failed to create the LaMa interface %s", crossing_interface_name_.c_str());
   }
   // Initialize the client for the setter service (interface to map).
   crossing_setter_ = nh_.serviceClient<lama_msgs::SetCrossing>(srv.response.set_service_name);
-  crossing_setter_.waitForExistence();
 }
 
 /** Start the subscriber, wait for an OccupancyGrid and exit upon reception.
  */
-void Jockey::getData()
+void Jockey::getLiveData()
 {
-  costmap_handler_ = private_nh_.subscribe<nav_msgs::OccupancyGrid>("local_costmap", 1, &Jockey::handleMap, this);
+  ros::Subscriber costmap_handler;
+  costmap_handler = private_nh_.subscribe<nav_msgs::OccupancyGrid>("local_costmap", 1, &Jockey::handleMap, this);
 
   /* Wait a bit to avoid the first throttled message. */
+  // TODO: simplify with ROS_INFO_STREAM_DELAYED_THROTTLE, when available.
   ros::Duration(0.3).sleep();
   ros::spinOnce();
   ros::Rate r(100);
@@ -82,12 +86,10 @@ void Jockey::getData()
     ros::spinOnce();
     if (data_received_)
     {
-      // Stop the subscribers (may be superfluous).
-      costmap_handler_.shutdown();
       data_received_ = false;
       break;
     }
-    ROS_INFO_STREAM_THROTTLE(5, "Did not received any map on " << costmap_handler_.getTopic());
+    ROS_INFO_STREAM_THROTTLE(5, "Did not received any map on " << costmap_handler.getTopic());
     r.sleep();
   }
 }
@@ -118,7 +120,7 @@ void Jockey::onGetVertexDescriptor()
     return;
   }
 
-  getData();
+  getLiveData();
 
   // Add the PlaceProfile to the descriptor list.
   lama_msgs::SetPlaceProfile profile_setter_srv;
@@ -158,37 +160,84 @@ void Jockey::onGetVertexDescriptor()
   server_.setSucceeded(result_);
 }
 
-void Jockey::onGetEdgesDescriptors()
-{
-  result_.state = lama_jockeys::LocalizeResult::NOT_SUPPORTED;
-  result_.completion_time = ros::Duration(0.0);
-  server_.setSucceeded(result_);
-}
-
+/** Return the transformation between the current and requested PlaceProfiles.
+ */
 void Jockey::onLocalizeInVertex()
 {
-  result_.state = lama_jockeys::LocalizeResult::NOT_SUPPORTED;
-  result_.completion_time = ros::Duration(0.0);
-  server_.setSucceeded(result_);
-}
+  getLiveData();
 
-void Jockey::onLocalizeEdge()
-{
-  result_.state = lama_jockeys::LocalizeResult::NOT_SUPPORTED;
-  result_.completion_time = ros::Duration(0.0);
+  // Get the requested PlaceProfile from database.
+  if (goal_.descriptor_link.interface_name != place_profile_interface_name_)
+  {
+    ROS_ERROR_STREAM("Expected a descriptor_link with interface " <<
+        place_profile_interface_name_ << " got " <<
+        goal_.descriptor_link.interface_name);
+    server_.setAborted();
+    return;
+  }
+  lama_msgs::GetPlaceProfile profile_srv;
+  profile_srv.request.id = goal_.descriptor_link.descriptor_id;
+  if (!place_profile_getter_.call(profile_srv))
+  {
+    ROS_ERROR_STREAM(jockey_name_ << ": failed to call service \"" <<
+        place_profile_interface_name_ << "\"");
+    server_.setAborted();
+    return;
+  }
+  
+  // Initialize the client for the localize_in_vertex service.
+  ros::ServiceClient localize_client;
+  localize_client = nh_.serviceClient<place_matcher_msgs::PolygonDissimilarity>(localize_service_);
+  while (ros::ok() && !localize_client.waitForExistence(ros::Duration(5.0)))
+  {
+    ROS_WARN_STREAM("Waiting for service " << localize_client.getService());
+  }
+
+  // Compare both polygons by calling the localize service.
+  result_.idata.clear();
+  result_.fdata.clear();
+  result_.fdata.reserve(7);  // x, y, z, qx, qy, qz, qw.
+  place_matcher_msgs::PolygonDissimilarity dissimi_srv;
+  dissimi_srv.request.polygon1 = profile_srv.response.descriptor.polygon;
+  dissimi_srv.request.polygon2 = profile_.polygon;
+  if (!localize_client.call(dissimi_srv))
+  {
+    ROS_ERROR_STREAM(jockey_name_ << ": failed to call service \"" << 
+        localize_client.getService() << "\"");
+    server_.setAborted();
+    return;
+  }
+  result_.fdata.push_back(dissimi_srv.response.pose.position.x);
+  result_.fdata.push_back(dissimi_srv.response.pose.position.y);
+  result_.fdata.push_back(dissimi_srv.response.pose.position.z);
+  result_.fdata.push_back(dissimi_srv.response.pose.orientation.x);
+  result_.fdata.push_back(dissimi_srv.response.pose.orientation.y);
+  result_.fdata.push_back(dissimi_srv.response.pose.orientation.z);
+  result_.fdata.push_back(dissimi_srv.response.pose.orientation.w);
+
+  result_.state = lama_jockeys::LocalizeResult::DONE;
+  result_.completion_time = getCompletionDuration();
   server_.setSucceeded(result_);
 }
 
 void Jockey::onGetDissimilarity()
 {
-  getData();
+  getLiveData();
 
-  // Get all scans from database.
+  // Initialize the client for the dissimilarity server.
+  ros::ServiceClient dissimilarity_client;
+  dissimilarity_client = nh_.serviceClient<place_matcher_msgs::PolygonDissimilarity>(dissimilarity_server_name_);
+  while (ros::ok() && !dissimilarity_client.waitForExistence(ros::Duration(5.0)))
+  {
+    ROS_WARN_STREAM("Waiting for service " << dissimilarity_client.getService());
+  }
+
+  // Get all PlaceProfile from database.
   lama_interfaces::ActOnMap srv;
   srv.request.action = lama_interfaces::ActOnMapRequest::GET_VERTEX_LIST;
   if (!map_agent_.call(srv))
   {
-    ROS_ERROR("Failed to call map agent");
+    ROS_ERROR_STREAM("Failed to call map agent \"" << map_agent_.getService() << "\"");
     server_.setAborted();
     return;
   }
@@ -205,7 +254,12 @@ void Jockey::onGetDissimilarity()
     desc_srv.request.action = lama_interfaces::ActOnMapRequest::GET_DESCRIPTOR_LINKS;
     desc_srv.request.object.id = srv.response.objects[i].id;
     desc_srv.request.interface_name = place_profile_interface_name_;
-    map_agent_.call(desc_srv);
+    if (!map_agent_.call(desc_srv))
+    {
+      ROS_ERROR_STREAM("Failed to call map agent \"" << map_agent_.getService() << "\"");
+      server_.setAborted();
+      return;
+    }
     if (desc_srv.response.descriptor_links.empty())
     {
       continue;
@@ -240,10 +294,10 @@ void Jockey::onGetDissimilarity()
   for (size_t i = 0; i < vertices.size(); ++i)
   {
     dissimi_srv.request.polygon2 = polygons[i];
-    if (!dissimilarity_server_.call(dissimi_srv))
+    if (!dissimilarity_client.call(dissimi_srv))
     {
       ROS_ERROR_STREAM(jockey_name_ << ": failed to call service \"" << 
-          dissimilarity_server_name_ << "\"");
+          dissimilarity_client.getService() << "\"");
       server_.setAborted();
       return;
     }
@@ -251,8 +305,7 @@ void Jockey::onGetDissimilarity()
     result_.fdata.push_back(dissimi_srv.response.raw_dissimilarity);
   }
 
-  ROS_INFO("%s: computed %zu dissimilarities", jockey_name_.c_str(),
-      result_.idata.size());
+  ROS_INFO_STREAM(jockey_name_ << ": computed " << result_.idata.size() << " dissimilarities");
   result_.state = lama_jockeys::LocalizeResult::DONE;
   result_.completion_time = getCompletionDuration();
   server_.setSucceeded(result_);
