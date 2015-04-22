@@ -186,6 +186,8 @@ void Jockey::handleCostmap(const nav_msgs::OccupancyGridConstPtr& msg)
         abs_crossing_.center.x, abs_crossing_.center.y, abs_crossing_.radius, abs_crossing_.frontiers.size());
   }
  
+  ROS_DEBUG("Crossing (%.3f, %.3f, %.3f), number of exits: %zu",
+      abs_crossing_.center.x, abs_crossing_.center.y, abs_crossing_.radius, abs_crossing_.frontiers.size());
 
   // Get the rotation between odom_frame_ and the map frame.
   tf::StampedTransform tr;
