@@ -219,7 +219,9 @@ void Jockey::handleCostmap(const nav_msgs::OccupancyGridConstPtr& msg)
   has_crossing_ = true;
 
   for (size_t i = 0; i < rel_crossing_.frontiers.size(); ++i)
+  {
     ROS_DEBUG("Relative frontier angle = %.3f", rel_crossing_.frontiers[i].angle);
+  }
 
   // Visualization: a sphere at detected crossing center.
   if (pub_crossing_marker_.getNumSubscribers())

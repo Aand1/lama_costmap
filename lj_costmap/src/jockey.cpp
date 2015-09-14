@@ -58,7 +58,7 @@ void Jockey::initMapCrossingInterface()
   }
   lama_interfaces::AddInterface srv;
   srv.request.interface_name = crossing_interface_name_;
-  srv.request.interface_type = lama_interfaces::AddInterfaceRequest::CLEARTEXT;
+  srv.request.interface_type = lama_interfaces::AddInterfaceRequest::SERIALIZED;
   srv.request.get_service_message = "lama_msgs/GetCrossing";
   srv.request.set_service_message = "lama_msgs/SetCrossing";
   if (!client.call(srv))
