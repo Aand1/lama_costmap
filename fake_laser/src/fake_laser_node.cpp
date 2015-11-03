@@ -22,6 +22,7 @@ std::string odom_frame_;
 tf::TransformListener* tf_listener_;
 map_ray_caster::MapRayCaster caster_;
 ros::Publisher* fake_laser_publisher_;
+ros::Publisher* fake_laser_absolute_publisher_;
 
 sensor_msgs::LaserScan rotateScan(sensor_msgs::LaserScan original_scan, float rotation) {
   sensor_msgs::LaserScan scan = original_scan;
@@ -66,6 +67,7 @@ void handleCostmap(const nav_msgs::OccupancyGridConstPtr& msg) {
   scan.angle_increment  = 2*M_PI/ 400;
   scan.header.frame_id = "base_laser_link";
   caster_.laserScanCast(*msg, scan);   
+  fake_laser_absolute_publisher_->publish(scan);
   fake_laser_publisher_->publish(rotateScan(scan,map_relative_orientation));
 }
 
@@ -84,6 +86,8 @@ int main(int argc, char **argv)
    ros::Subscriber costmap_handler_ = nh.subscribe("local_costmap", 1, handleCostmap);
    ros::Publisher fk = nh.advertise<sensor_msgs::LaserScan>("fake_laser",10);
    fake_laser_publisher_ = &fk;
+   ros::Publisher fka = nh.advertise<sensor_msgs::LaserScan>("fake_laser_absolute",10);
+   fake_laser_absolute_publisher_ = &fka;
    tf_listener_ = new tf::TransformListener();
 
    ros::spin();
